@@ -1,0 +1,9 @@
+Package: PTT
+Type: Package
+Title: Polya tree type models
+Version: 0.1.0
+Author: Li Ma
+Maintainer: Li Ma <li.ma@duke.edu>
+Description: This package implements several Bayesian nonparametric models that generalize the Polya tree process
+License: GPL >= 3
+LazyData: TRUE
