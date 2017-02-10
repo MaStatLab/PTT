@@ -1,12 +1,14 @@
 #ifndef GBT_H
 #define GBT_H
+
 #define NUMNODEVAR 50
-class GBT {  
+
+class GBT {
 public:
     //data dimmensions
     int nobs;   //number of observations
     int p;      //total number of predictors
-    
+
     //model parameters
     int k; // maximum model size
     double rho0; // stopping probability at level 0 (sample space)
@@ -22,9 +24,9 @@ public:
     double *logrho_vec;
 
     //constructors
-    GBT(uint *Xwork, int nobs, int k, int p, double rho0, int rho_mode, int tran_mode, double lognu_lowerbound, double lognu_upperbound, int n_grid, int n_s, double beta);
+    GBT(Mat<unsigned int> X, int nobs, int k, int p, double rho0, int rho_mode, int tran_mode, double lognu_lowerbound, double lognu_upperbound, int n_grid, int n_s, double beta);
     ~GBT();
-    
+
     //main functions
     int update_node(double *, int, INDEX_TYPE);
     int update();
@@ -44,35 +46,35 @@ public:
     void find_hmap(int print);
     vector< vector<ushort> > find_part();
     int find_sample_part(vector< vector< ushort> > &part_points, vector< vector< double> > &nu_and_probs);
-    
+
     vector<double> compute_predictive_density(uint *Xnew, int nobs_new);
 
 private:
     //data
-     
+
     //working variables
     double **models;
     unsigned int *modelscount;
-    
+
     vector< pair< pair< INDEX_TYPE, int >, pair< double,double > > > sample_nodes;
     vector< pair< INDEX_TYPE, pair<int,int> > > hmap_nodes;
 
     void init(uint *Xwork);
     void clear();
-    
+
     void sample_subtree(INDEX_TYPE& I,int level,int s, double prob);
     void find_hmap_subtree(INDEX_TYPE& I, int level);
 
     double get_add_prob(INDEX_TYPE& I,int i, int t, int level);
     double *get_child(INDEX_TYPE& I, int i,int level,ushort which);
     double *get_node(INDEX_TYPE& I, int level);
-    
+
     int convert_obs_to_uint(int *obs,INDEX_TYPE I,int level);
     void add_data_to_subtree(INDEX_TYPE I, int level, int x_curr, int part_count, uint *obs);
     void remove_data_from_subtree(INDEX_TYPE I, int level, int x_curr, int part_count, uint *obs);
     int update_subtree_add_new_data(INDEX_TYPE I, int level, int x_curr, int part_count, uint *new_obs);
     int update_subtree_remove_new_data(INDEX_TYPE I, int level, int x_curr, int part_count, uint *new_obs);
-  
+
 
 };
 #endif
