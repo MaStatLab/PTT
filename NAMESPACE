@@ -1,1 +1,11 @@
+useDynLib(PTT)
 exportPattern("^[[:alpha:]]+")
+importFrom(Rcpp, evalCpp)
+importFrom(utils, head, tail)
+importFrom(grDevices, colorRampPalette)
+importFrom(graphics, axis, layout, mtext, par, plot,
+             points, rect, smoothScatter, title)
+import(optimx, igraph)
+export(markov.apt.density, plot.part, plot.roc)
+
+

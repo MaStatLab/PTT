@@ -1,4 +1,8 @@
 #include "helpers.h"
+#include "gbt.h"
+
+#include <vector>
+using namespace std;
 
 double GBT::make_rho0(int level) {
 
@@ -47,7 +51,7 @@ double GBT::get_log_Ma(double theta0,int n_0,int n_1,int t) {
 
 void GBT::make_prior_logrho_mat(int level) { // logrho_mat is the n_s*(n_s+1) log transition matrix
 
-  double cumulative_rho = 0;
+  // double cumulative_rho = 0;
   for (int s = 0; s < n_s; s++) {
     make_prior_logrho_vec(logrho_mat[s],level, s);
   }
@@ -57,10 +61,10 @@ void GBT::make_prior_logrho_mat(int level) { // logrho_mat is the n_s*(n_s+1) lo
 }
 
 
-GBT::GBT(Mat<unsigned int> X,int nobs, int k, int p, double rho0, int rho_mode, int tran_mode,
+GBT::GBT(Mat< unsigned int > X,int nobs, int k, int p, double rho0, int rho_mode, int tran_mode,
          double lognu_lowerbound, double lognu_upperbound, int n_grid = 1, int n_s=4, double beta=0.1):
-        k(k), p(p), nobs(nobs), rho0(rho0),rho_mode(rho_mode),tran_mode(tran_mode), beta(beta),n_s(n_s),
-        lognu_lowerbound(lognu_lowerbound),lognu_upperbound(lognu_upperbound),n_grid(n_grid) {
+        nobs(nobs), p(p), k(k), rho0(rho0),n_s(n_s), rho_mode(rho_mode), tran_mode(tran_mode), beta(beta),
+        lognu_lowerbound(lognu_lowerbound),lognu_upperbound(lognu_upperbound), n_grid(n_grid) {
 
 
     init(X);
@@ -232,6 +236,7 @@ void GBT::find_hmap_subtree(INDEX_TYPE& I, int level) {
     int j,t;
     double *node = get_node(I,level);
     double logrho0 = log(make_rho0(level));
+
     int curr_max_state, curr_max_dim;
     double curr_phi_max, curr_Zj_max, curr_Zj;
 
@@ -368,12 +373,11 @@ void GBT::make_prior_logrho_vec(double *logrho_vec, int level, int s) {
 
 void GBT::make_posterior_logrho_vec(double *logrho_vec, INDEX_TYPE& I,int level,int s) {
 
-  int i,t;
   double *node = get_node(I,level);
 
   make_prior_logrho_vec(logrho_vec,level,s); // initialization of logrho_vec with prior values
 
-  for (t = 0; t <= n_s; t++) {
+  for (int t = 0; t <= n_s; t++) {
     logrho_vec[t] = logrho_vec[t] + node[1+t]-node[2+n_s+s];
   }
 
@@ -455,7 +459,7 @@ void GBT::sample_subtree(INDEX_TYPE& I,int level,int s,double log_prob) {
       }
 
 
-      theta = rbeta(theta0*nu+n0,(1-theta0)*nu+n1);
+      theta = rbeta(1,theta0*nu+n0,(1-theta0)*nu+n1)[0];
       sample_nodes.push_back(make_pair(make_pair(I,level),make_pair(nu,log_prob)));
       sample_subtree(child_index_0,level+1,t,log_prob+log(theta));
       sample_subtree(child_index_1,level+1,t,log_prob+log(1-theta));
@@ -486,11 +490,11 @@ void GBT::find_hmap(int print = 0) {
   }
 }
 
-vector< vector<ushort> > GBT::find_part() {
-  vector< vector<ushort> > part_points;
+vector< vector< ushort > > GBT::find_part() {
+  vector< vector< ushort > > part_points;
   vector< pair<INDEX_TYPE, pair<int,int> > >::iterator it;
   int i;
-  vector<ushort> v(2*p+2);
+  vector< ushort > v(2*p+2);
 
   INDEX_TYPE I;
   int level;
@@ -549,7 +553,7 @@ vector< vector<ushort> > GBT::find_part() {
   return part_points;
 }
 
-int GBT::find_sample_part(vector< vector< ushort> > &part_points, vector< vector< double> > &nu_and_probs) {
+int GBT::find_sample_part(vector< vector< ushort > > &part_points, vector< vector< double> > &nu_and_probs) {
 
   vector< pair< pair< INDEX_TYPE, int >, pair< double, double > > >::iterator it;
   int i;
@@ -639,16 +643,7 @@ double *GBT::get_node(INDEX_TYPE& I, int level) {
 }
 
 
-int GBT::convert_obs_to_uint(int *obs,INDEX_TYPE I,int level) {
-  uint res = 0;
-  for (int j = 0; j < level; j++) {
-    int i = I.var[j] - 1;
-    res += ((uint) (obs[i])) << j;
-  }
-  return res;
-}
-
-void GBT::add_data_to_subtree(INDEX_TYPE I, int level, int x_curr, int part_count, col<unsigned int> obs) {
+void GBT::add_data_to_subtree(INDEX_TYPE I, int level, int x_curr, int part_count, Col<unsigned int> obs) {
 
   double *NODE_CURR;
   INDEX_TYPE I_child;
@@ -672,7 +667,7 @@ void GBT::add_data_to_subtree(INDEX_TYPE I, int level, int x_curr, int part_coun
   }
 }
 
-void GBT::remove_data_from_subtree(INDEX_TYPE I, int level, int x_curr, int part_count, uint *obs) {
+void GBT::remove_data_from_subtree(INDEX_TYPE I, int level, int x_curr, int part_count, Col< unsigned int > obs) {
   double *NODE_CURR;
   INDEX_TYPE I_child;
   NODE_CURR = get_node(I,level);
@@ -683,19 +678,19 @@ void GBT::remove_data_from_subtree(INDEX_TYPE I, int level, int x_curr, int part
   if (level < k) { // not maximum (leaf) node
 
     i = x_curr - 1;
-    I_child = make_child_index(I, i, level, (obs[i] >> part_count) & 1);
+    I_child = make_child_index(I, i, level, (obs(i) >> part_count) & 1);
     remove_data_from_subtree(I_child, level+1, x_curr, part_count+1, obs);
 
 
     for (i = x_curr; i < p; i++) {
-      I_child = make_child_index(I,i,level,obs[i] & 1);
+      I_child = make_child_index(I,i,level,obs(i) & 1);
       remove_data_from_subtree(I_child, level+1, i+1, 1, obs);
     }
   }
 }
 
 
-int GBT::update_subtree_add_new_data(INDEX_TYPE I, int level, int x_curr, int part_count, col< unsigned int > new_obs) {
+int GBT::update_subtree_add_new_data(INDEX_TYPE I, int level, int x_curr, int part_count, Col< unsigned int > new_obs) {
   double *NODE_CURR;
   INDEX_TYPE I_child;
 
@@ -726,7 +721,7 @@ int GBT::update_subtree_add_new_data(INDEX_TYPE I, int level, int x_curr, int pa
 
 }
 
-int GBT::update_subtree_remove_new_data(INDEX_TYPE I, int level, int x_curr, int part_count, col< unsigned int > new_obs) {
+int GBT::update_subtree_remove_new_data(INDEX_TYPE I, int level, int x_curr, int part_count, Col< unsigned int > new_obs) {
   double *NODE_CURR;
   INDEX_TYPE I_child;
 
@@ -738,13 +733,13 @@ int GBT::update_subtree_remove_new_data(INDEX_TYPE I, int level, int x_curr, int
   if (level < k) { // not maximum (leaf) node
 
     i = x_curr - 1;
-    I_child = make_child_index(I, i, level, (new_obs[i] >> part_count) & 1);
+    I_child = make_child_index(I, i, level, (new_obs(i) >> part_count) & 1);
     update_subtree_remove_new_data(I_child, level+1, x_curr, part_count+1, new_obs);
 
 
     for (i = x_curr; i < p; i++) {
 
-      I_child = make_child_index(I,i,level,new_obs[i] & 1);
+      I_child = make_child_index(I,i,level,new_obs(i) & 1);
       update_subtree_remove_new_data(I_child, level+1, i+1, 1, new_obs);
     }
 

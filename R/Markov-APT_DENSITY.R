@@ -1,40 +1,50 @@
-markov.apt.density.kD= function( x.mat, max.dim = 10, rho0=0.2, rho0.mode = 0,tran.mode=1,lognu.lb=-1, lognu.ub=4, n.grid=5, n.s=2,beta=0.1,x.mat.pred=NULL,n.post.samples=0){
-  
-  if (!is.loaded("../src/markov_apt_kD_density_C.so"))
-    dyn.load('../src/markov_apt_kD_density_C.so')
+markov.apt.density= function( X, Xpred = NULL, Omega.type = "unit", max.dim = 10, rho0=0.2, rho0.mode = 0,tran.mode=1,
+                                 lognu.lb=-1, lognu.ub=4, n.grid=5, n.s=2,beta=0.1,x.mat.pred=NULL,n.post.samples=0){
 
-  if (is.vector(x.mat)) {
-    x.mat = rbind(NULL,x.mat)
+  X = as.matrix(X)
+  p = ncol(X)
+
+  if (Omega.type == "unit") {
+
+    Omega = matrix(rep(c(0,1),2*p),nrow=p,ncol=2,byrow=TRUE)
+
+  } else if(Omega.type == "standardized") {
+
+    Omega = t(apply(X,2,range))
+    Omega[,2] = Omega[,2]*1.00001
+  }
+  else
+  {
+    print("ERROR: Sample space 'Omega' incorrectly specified")
+    return(0);
   }
 
-  
-  n.pred = as.integer(ncol(x.mat))
-  if (is.null(x.mat.pred)) {
-    x.mat.pred=rbind(NULL,rep(0.5,n.pred))
+
+  if (is.null(Xpred)) {
+    Xpred = matrix(rep(0.5,p),ncol=p,nrow=1)
   } else {
-    if (is.vector(x.mat.pred)) {
-      x.mat.pred = rbind(NULL,x.mat.pred)
-    }
+    Xpred = as.matrix(Xpred)
   }
 
-  
-  ans = .Call('markov_apt_kD_C', as.numeric(t(x.mat)), as.integer(ncol(x.mat)), as.integer(max.dim), as.numeric(rho0), as.integer(rho0.mode),as.integer(tran.mode),as.numeric(lognu.lb),as.numeric(lognu.ub),as.integer(n.grid),as.integer(n.s),as.numeric(beta),as.integer(n.post.samples),as.numeric(t(x.mat.pred)))
+  ans = fitPTTcpp(X,Xpred,Omega,max.dim,rho0,rho0.mode,tran.mode,lognu.lb,lognu.ub,n.grid,n.s,beta,n.post.samples)
 
   if (n.post.samples > 0) {
-
-    names(ans)=c("logrho","logphi","partition","ppd","part.post.samples")
-
     for (i in 1:n.post.samples) {
-      nvar = ncol(x.mat)
-      colnames(ans$part.post.samples[[i]])[(2*nvar+1):(2*nvar+3)] = c("level","nu","logp")
+      part.post.sample = matrix(unlist(ans$part_points_post_samples[[i]]),byrow=TRUE,ncol=2*p+1)
+      colnames(part.post.sample)[2*p+1] = "level"
+      nu.post.sample = matrix(unlist(ans$nu_and_prob_post_samples[[i]]),byrow=TRUE,ncol=2)
+      colnames(nu.post.sample) = c("nu","logp")
+
+      ans$part_points_post_samples[[i]] = cbind(part.post.sample,nu.post.sample)
     }
-    
-  } else {
-    names(ans)=c("logrho","logphi","partition","ppd")
+
   }
-  
+  else {
+    ans[which(names(ans) == "part_points_post_samples")] = NULL
+  }
+  ans[which(names(ans) == "nu_and_prob_post_samples")] = NULL
+
   return(ans)
 }
-
 
 

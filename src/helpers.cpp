@@ -101,7 +101,8 @@ unsigned int get_node_index(INDEX_TYPE& I,int level){
 
   return NUMNODEVAR*(r*pow2(level) + (unsigned long long) I.var[MAXVAR]);
 }
-inline INDEX_TYPE init_index(int n,int level) {
+
+INDEX_TYPE init_index(int n,int level) {
   INDEX_TYPE init;
 
   for (int i=0; i < level; i++) {init.var[i] = i+1;}
@@ -110,7 +111,7 @@ inline INDEX_TYPE init_index(int n,int level) {
   return init;
 }
 
-inline INDEX_TYPE make_child_index(INDEX_TYPE& I, unsigned short part_dim, int level, ushort which) {
+INDEX_TYPE make_child_index(INDEX_TYPE& I, unsigned short part_dim, int level, ushort which) {
   INDEX_TYPE child_index = I;
   unsigned short data = part_dim+1;
   int i;
@@ -159,7 +160,7 @@ inline INDEX_TYPE make_child_index(INDEX_TYPE& I, unsigned short part_dim, int l
 }
 
 
-inline INDEX_TYPE get_next_node(INDEX_TYPE& I, int p, int level) {
+INDEX_TYPE get_next_node(INDEX_TYPE& I, int p, int level) {
 
   INDEX_TYPE node = I;
   int i = level-1; int j = p + level -2;
@@ -179,7 +180,7 @@ inline INDEX_TYPE get_next_node(INDEX_TYPE& I, int p, int level) {
   return node;
 }
 
-inline uint convert_to_inverse_base_2(double x, int k) {
+uint convert_to_inverse_base_2(double x, int k) {
 
   uint x_base_2 = (uint) floor (x * pow2(k) );
   uint x_base_inverse_2 = 0;
@@ -192,7 +193,7 @@ inline uint convert_to_inverse_base_2(double x, int k) {
   return x_base_inverse_2;
 }
 
-inline uint convert_to_base_2(double x, int k) {
+uint convert_to_base_2(double x, int k) {
 
   uint x_base_2 = (uint) floor (x * pow2(k) );
 

@@ -1,8 +1,10 @@
 #ifndef HELPERS_H
 #define HELPERS_H
 
+#define NUMNODEVAR 50
 #define MAXVAR 15  // down no more than 14 levels
-#include<RcppArmadillo.h>
+#include <RcppArmadillo.h>
+#include <vector>
 
 using namespace Rcpp;
 using namespace arma;
@@ -29,14 +31,14 @@ unsigned int Choose(int n, int k);
 
 unsigned int get_node_index(INDEX_TYPE& I,int level);
 
-inline INDEX_TYPE init_index(int n,int level);
+INDEX_TYPE init_index(int n,int level);
 
-inline INDEX_TYPE make_child_index(INDEX_TYPE& I, unsigned short part_dim, int level, ushort which);
+INDEX_TYPE make_child_index(INDEX_TYPE& I, unsigned short part_dim, int level, ushort which);
 
-inline INDEX_TYPE get_next_node(INDEX_TYPE& I, int p, int level);
+INDEX_TYPE get_next_node(INDEX_TYPE& I, int p, int level);
 
-inline uint convert_to_inverse_base_2(double x, int k);
+uint convert_to_inverse_base_2(double x, int k);
 
-inline uint convert_to_base_2(double x, int k);
+uint convert_to_base_2(double x, int k);
 
 #endif
