@@ -1,6 +1,6 @@
 x=seq(from=0.0001,to=0.9999,by=0.002)
 set.seed(100)
-nobs = 500
+nobs = 5000
 max.dim=11
 size.max = nobs
 
@@ -17,7 +17,7 @@ pred.den = markov.apt.density(X=obs.mat,Xpred=x,max.dim=max.dim,rho0=0.2,rho0.mo
 
 xlim = c(0,1)
 ylim = c(0,15)
-plot(x,pred.den,type='l',xlim=xlim,ylim=ylim,xlab="x",ylab="Density")
+plot(x,pred.den,type='l',xlim=xlim,ylim=ylim,xlab="x",ylab="Density",main="PPD for Markov-APT")
 par(new=TRUE)
 plot(x,true.den,type='l',lty=2,col='red',xlab="",ylab="",xlim=xlim,ylim=ylim)
 
@@ -29,7 +29,7 @@ pred.den.opt = markov.opt.density(X=obs.mat,Xpred=x,max.dim=max.dim,rho0=0.2,rho
 
 xlim = c(0,1)
 ylim = c(0,15)
-plot(x,pred.den.opt,type='l',xlim=xlim,ylim=ylim,xlab="x",ylab="Density")
+plot(x,pred.den.opt,type='l',xlim=xlim,ylim=ylim,xlab="x",ylab="Density",main="PPD for OPT")
 par(new=TRUE)
 plot(x,true.den,type='l',lty=2,col='red',xlab="",ylab="",xlim=xlim,ylim=ylim)
 
