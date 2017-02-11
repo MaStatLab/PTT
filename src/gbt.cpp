@@ -26,11 +26,17 @@ double GBT::get_log_Ma(double theta0,int n_0,int n_1,int t) {
   double log_Ma_nu;
   int i;
 
-  // compute the marginal likelihood for state t with G=n_grid grid points
-  lb_lognu = lognu_lowerbound + (1.0*t)/n_s*(lognu_upperbound-lognu_lowerbound);
-  ub_lognu = lognu_lowerbound + (1.0*(t+1))/n_s*(lognu_upperbound-lognu_lowerbound);
+  if (lognu_upperbound > lognu_lowerbound) {
+    // compute the marginal likelihood for state t with G=n_grid grid points
+    lb_lognu = lognu_lowerbound + (1.0*t)/n_s*(lognu_upperbound-lognu_lowerbound);
+    ub_lognu = lognu_lowerbound + (1.0*(t+1))/n_s*(lognu_upperbound-lognu_lowerbound);
+    bandwidth = (ub_lognu - lb_lognu)/n_grid;
+  }
 
-  bandwidth = (ub_lognu - lb_lognu)/n_grid;
+  else { // This corresponds to the case when a single nu value is specified such as for an OPT
+    lb_lognu = ub_lognu = (lognu_lowerbound + lognu_upperbound)/2;
+    bandwidth = 0;
+  }
 
   for (i=0; i < n_grid; i++) {
 
@@ -46,7 +52,6 @@ double GBT::get_log_Ma(double theta0,int n_0,int n_1,int t) {
   }
 
   return(log_Ma_curr-log(n_grid));
-
 }
 
 void GBT::make_prior_logrho_mat(int level) { // logrho_mat is the n_s*(n_s+1) log transition matrix
