@@ -20,3 +20,4 @@ See examples for 1D and 2D.
 ### Reference
 
 Ma L. (2016) Adaptive shrinkage in Polya tree type models. Bayesian Analysis. doi:10.1214/16-BA1021
+Wong WH and Ma L. (2010) Optional Polya tree and Bayesian inference. Annals of Statistics. doi:10.1214/09-AOS755
