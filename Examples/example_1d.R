@@ -11,7 +11,7 @@ obs.mat = as.matrix((sample.ind<=p1)*runif(size.max)+(p1<sample.ind & sample.ind
 
 true.den = p1*dunif(x) + p2*dunif(x,0.25,0.5) + p3 *4*dbeta((x-0.25)*4,2,2) + p4*dbeta(x,5000,2000)
 
-
+## Fit a Markov APT
 ans = markov.apt.density(X=obs.mat,max.dim=max.dim,rho0=0.2,rho0.mode=0,n.s=3,tran.mode=1,beta=0,lognu.lb=-1,lognu.ub=4,n.grid=5)
 pred.den = markov.apt.density(X=obs.mat,Xpred=x,max.dim=max.dim,rho0=0.2,rho0.mode=0,n.s=3,tran.mode=1,beta=0,lognu.lb=-1,lognu.ub=4,n.grid=5)$pred
 
@@ -22,7 +22,7 @@ par(new=TRUE)
 plot(x,true.den,type='l',lty=2,col='red',xlab="",ylab="",xlim=xlim,ylim=ylim)
 
 
-## Try OPT instead
+## Fit OPT instead
 ans.opt = markov.opt.density(X=obs.mat,max.dim=max.dim,rho0=0.2,rho0.mode=0)
 pred.den.opt = markov.opt.density(X=obs.mat,Xpred=x,max.dim=max.dim,rho0=0.2,rho0.mode=0)$pred
 
