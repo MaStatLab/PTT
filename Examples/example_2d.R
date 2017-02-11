@@ -33,7 +33,7 @@ max.dim = 11
 
 library(grid)
 
-markov.apt.2D.fit = markov.apt.density(obs.mat,max.dim=max.dim,rho0=0.1,rho0.mode=0,n.s=5,tran.mode=2,beta=0,
+markov.apt.2D.fit = apt(obs.mat,max.dim=max.dim,rho0=0.1,rho0.mode=0,n.s=5,tran.mode=2,beta=0,
                                        lognu.lb=-1,lognu.ub=4,n.grid=5,x.mat.pred=xy.grid,n.post.samples = n.post.sample)
 
 for (i in 1:n.post.sample) {

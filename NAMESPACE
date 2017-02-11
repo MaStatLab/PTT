@@ -6,6 +6,6 @@ importFrom(grDevices, colorRampPalette)
 importFrom(graphics, axis, layout, mtext, par, plot,
              points, rect, smoothScatter, title)
 import(optimx, igraph)
-export(markov.apt.density, plot.part, plot.roc)
+export(apt, opt, plot.part, plot.roc)
 
 

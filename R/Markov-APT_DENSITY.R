@@ -1,4 +1,4 @@
-markov.apt.density= function( X, Xpred = NULL, Omega.type = "unit", max.dim = 10, rho0=0.2, rho0.mode = 0,tran.mode=1,
+apt = function( X, Xpred = NULL, Omega.type = "unit", max.dim = 10, rho0=0.2, rho0.mode = 0,tran.mode=1,
                                  lognu.lb=-1, lognu.ub=4, n.grid=5, n.s=2,beta=0.1,n.post.samples=0){
 
   X = as.matrix(X)
@@ -48,7 +48,7 @@ markov.apt.density= function( X, Xpred = NULL, Omega.type = "unit", max.dim = 10
 }
 
 ## Fitting an optional Polya tree model
-markov.opt.density= function( X, Xpred = NULL, Omega.type = "unit", max.dim = 10, rho0=0.2, rho0.mode = 0, n.post.samples=0) {
+opt = function( X, Xpred = NULL, Omega.type = "unit", max.dim = 10, rho0=0.2, rho0.mode = 0, n.post.samples=0) {
 
   ans = markov.apt.density(X=X, Xpred=Xpred, Omega.type=Omega.type, max.dim=max.dim, rho0=rho0, rho0.mode = rho0.mode,tran.mode=1,
                            lognu.lb=0, lognu.ub=0, n.grid=1, n.s=1,beta=0,n.post.samples=n.post.samples)
