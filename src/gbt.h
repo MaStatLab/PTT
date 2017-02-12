@@ -35,7 +35,7 @@ public:
     //getters
     double get_root_logrho();
     double get_root_logphi();
-    double get_log_Ma(double theta0,int n_0,int n_1,int t);
+
     double make_alpha0(int t, int level);
     double make_rho0(int level);
     void make_prior_logrho_mat(int level);
@@ -51,7 +51,7 @@ public:
     vector< vector< ushort > > find_part();
     int find_sample_part(vector< vector< ushort > > &part_points, vector< vector< double > > &nu_and_probs);
 
-private:
+protected:
     //data
 
     //working variables
@@ -76,6 +76,8 @@ private:
     int update_subtree_add_new_data(INDEX_TYPE I, int level, int x_curr, int part_count, Col< unsigned int > new_obs);
     int update_subtree_remove_new_data(INDEX_TYPE I, int level, int x_curr, int part_count, Col< unsigned int > new_obs);
 
+private:
+    double get_log_Ma(double theta0,int n_0,int n_1,int t);
 
 };
 #endif
