@@ -5,3 +5,7 @@ fitPTTcpp <- function(X, Xnew, Omega, k = 10L, rho0 = 0.2, rho0_mode = 0L, tran_
     .Call('PTT_fitPTTcpp', PACKAGE = 'PTT', X, Xnew, Omega, k, rho0, rho0_mode, tran_mode, lognu_lowerbound, lognu_upperbound, n_grid, n_s, beta, n_post_samples)
 }
 
+fitCondPTTcpp <- function(X, Y, Xnew, Ynew, Omega_X, Omega_Y, k_X = 5L, k_Y = 5L, rho0_X = 0.2, rho0_Y = 0.2, rho0_mode_X = 0L, rho0_mode_Y = 0L, tran_mode = 1L, lognu_lowerbound = -1, lognu_upperbound = 4, n_grid = 5L, n_s = 5L, beta = 0, n_post_samples = 0L) {
+    .Call('PTT_fitCondPTTcpp', PACKAGE = 'PTT', X, Y, Xnew, Ynew, Omega_X, Omega_Y, k_X, k_Y, rho0_X, rho0_Y, rho0_mode_X, rho0_mode_Y, tran_mode, lognu_lowerbound, lognu_upperbound, n_grid, n_s, beta, n_post_samples)
+}
+

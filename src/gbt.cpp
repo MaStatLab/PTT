@@ -1,4 +1,3 @@
-#include "helpers.h"
 #include "gbt.h"
 
 #include <vector>
@@ -74,16 +73,8 @@ GBT::GBT(Mat< unsigned int > X,int nobs, int k, int p, double rho0, int rho_mode
 
     init(X);
 
-
-    loglambda0 = (-1.0) * log((double) p); // noninformative prior seleciton probabilities
-
-    logrho_mat = new double * [n_s];
-    for (int s = 0; s < n_s; s++) {
-      logrho_mat[s] = new double [n_s+1];
-    }
-
-    logrho_vec = new double[n_s+1];
 }
+
 
 GBT::~GBT() {
     clear();
@@ -140,20 +131,20 @@ int GBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
 
       for (int i=0; i < p; i++) { // for each dimension i
 
-	CHILD_0 = get_child(I,i,level,0);
-	CHILD_1 = get_child(I,i,level,1);
+	      CHILD_0 = get_child(I,i,level,0);
+	      CHILD_1 = get_child(I,i,level,1);
 
 
-	Zi = loglambda0
-	  + get_log_Ma(0.5,CHILD_0[0],CHILD_1[0],t)
-	  + CHILD_0[2+n_s+t] + CHILD_1[2+n_s+t];
+	      Zi = loglambda0
+	          + get_log_Ma(0.5,CHILD_0[0],CHILD_1[0],t)
+	          + CHILD_0[2+n_s+t] + CHILD_1[2+n_s+t];
 
 
-	if (Z[t] == -DBL_MAX) {
-	  Z[t] = Zi;
-	} else {
-	  Z[t] = log_exp_x_plus_exp_y (Z[t], Zi);
-	}
+	      if (Z[t] == -DBL_MAX) {
+	          Z[t] = Zi;
+	      } else {
+	          Z[t] = log_exp_x_plus_exp_y (Z[t], Zi);
+	      }
       }
 
 
@@ -194,6 +185,7 @@ int GBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
 }
 
 
+
 int GBT::update() {
 
 
@@ -209,27 +201,21 @@ int GBT::update() {
 
       while (count < modelscount[level]) {
 
-	NODE_CURR = get_node(I,level);
+	      NODE_CURR = get_node(I,level);
 
+	      for (uint j = 0; j < pow2(level) ; j++) {
 
+	      I.var[MAXVAR] = j;
+ 	      update_node(NODE_CURR,level,I);
+	      NODE_CURR += NUMNODEVAR;
 
-	for (uint j = 0; j < pow2(level) ; j++) {
+	      }
 
-
-	  I.var[MAXVAR] = j;
- 	  update_node(NODE_CURR,level,I);
-	  NODE_CURR += NUMNODEVAR;
-
-	}
-
-	I = get_next_node(I,p,level); count++;
+	      I = get_next_node(I,p,level); count++;
 
 
       }
     }
-
-
-
 
     return 0;
 }
@@ -723,8 +709,9 @@ int GBT::update_subtree_add_new_data(INDEX_TYPE I, int level, int x_curr, int pa
   update_node(NODE_CURR,level,I);
 
   return 0;
-
 }
+
+
 
 int GBT::update_subtree_remove_new_data(INDEX_TYPE I, int level, int x_curr, int part_count, Col< unsigned int > new_obs) {
   double *NODE_CURR;
@@ -784,6 +771,7 @@ vector<double> GBT::compute_predictive_density(Mat< unsigned int >Xnew) {
 }
 
 
+
 void GBT::init(Mat< unsigned int > X) {
   unsigned long long i, j;
   unsigned long long l;
@@ -795,14 +783,12 @@ void GBT::init(Mat< unsigned int > X) {
         modelscount[i] = Choose(p + i - 1, i);
         models[i] = new double[(unsigned long long) (modelscount[i]*NUMNODEVAR) << i];
 
-	for (j=0; j < modelscount[i] ; j++) {
-	  for (l=0; l < pow2(i); l++) {
-	    models[i][(j*pow2(i)+l)*NUMNODEVAR] = 0; // Initialize NODE_CURR[0] to 0
-	  }
-	}
+	    for (j=0; j < modelscount[i] ; j++) {
+	        for (l=0; l < pow2(i); l++) {
+	          models[i][(j*pow2(i)+l)*NUMNODEVAR] = 0; // Initialize NODE_CURR[0] to 0
+	        }
+	    }
     }
-
-
 
    // step 1: add data into the models
 
@@ -812,14 +798,31 @@ void GBT::init(Mat< unsigned int > X) {
       add_data_to_subtree(I_root,0,1,0,X.row(i).t()); // code the data matrix such that each observation is in contiguity
     }
 
+    // initialize prior parameters
+    init_prior();
 
 }
 
+
+
+void GBT::init_prior() {
+
+  loglambda0 = (-1.0) * log((double) p); // noninformative prior seleciton probabilities
+
+  logrho_mat = new double * [n_s];
+  for (int s = 0; s < n_s; s++) {
+    logrho_mat[s] = new double [n_s+1];
+  }
+
+  logrho_vec = new double[n_s+1];
+
+}
 
 void GBT::clear() {
     for (int i =0; i <= k; i++) {
         delete [] models[i];
     }
+
     delete [] models; models = NULL;
     delete [] modelscount;modelscount= NULL;
 
@@ -833,7 +836,11 @@ void GBT::clear() {
     logrho_mat=NULL;
 }
 
-double GBT::get_root_logrho() { return log(rho0) + models[0][1+n_s] - (get_root_logphi()-models[0][0]*k*log(2.0));}
+
+
+double GBT::get_root_logrho() {
+  return log(rho0) + models[0][1+n_s] - (get_root_logphi()-models[0][0]*k*log(2.0));
+}
 
 double GBT::get_root_logphi() {
 
@@ -845,9 +852,9 @@ double GBT::get_root_logphi() {
   log_root_phi -= log(n_s);
 
   return log_root_phi + models[0][0] * k * log(2.0);
-
-
 }
+
+
 
 double GBT::get_node_logphi(vector<double> &node_INFO) { // this function only applies with uniform prior over all shrinkage states
 
@@ -862,3 +869,4 @@ double GBT::get_node_logphi(vector<double> &node_INFO) { // this function only a
 
 
 }
+

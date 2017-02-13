@@ -29,3 +29,32 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// fitCondPTTcpp
+Rcpp::List fitCondPTTcpp(arma::mat X, arma::mat Y, arma::mat Xnew, arma::mat Ynew, arma::mat Omega_X, arma::mat Omega_Y, int k_X, int k_Y, double rho0_X, double rho0_Y, int rho0_mode_X, int rho0_mode_Y, int tran_mode, double lognu_lowerbound, double lognu_upperbound, int n_grid, int n_s, double beta, int n_post_samples);
+RcppExport SEXP PTT_fitCondPTTcpp(SEXP XSEXP, SEXP YSEXP, SEXP XnewSEXP, SEXP YnewSEXP, SEXP Omega_XSEXP, SEXP Omega_YSEXP, SEXP k_XSEXP, SEXP k_YSEXP, SEXP rho0_XSEXP, SEXP rho0_YSEXP, SEXP rho0_mode_XSEXP, SEXP rho0_mode_YSEXP, SEXP tran_modeSEXP, SEXP lognu_lowerboundSEXP, SEXP lognu_upperboundSEXP, SEXP n_gridSEXP, SEXP n_sSEXP, SEXP betaSEXP, SEXP n_post_samplesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Xnew(XnewSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Ynew(YnewSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Omega_X(Omega_XSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Omega_Y(Omega_YSEXP);
+    Rcpp::traits::input_parameter< int >::type k_X(k_XSEXP);
+    Rcpp::traits::input_parameter< int >::type k_Y(k_YSEXP);
+    Rcpp::traits::input_parameter< double >::type rho0_X(rho0_XSEXP);
+    Rcpp::traits::input_parameter< double >::type rho0_Y(rho0_YSEXP);
+    Rcpp::traits::input_parameter< int >::type rho0_mode_X(rho0_mode_XSEXP);
+    Rcpp::traits::input_parameter< int >::type rho0_mode_Y(rho0_mode_YSEXP);
+    Rcpp::traits::input_parameter< int >::type tran_mode(tran_modeSEXP);
+    Rcpp::traits::input_parameter< double >::type lognu_lowerbound(lognu_lowerboundSEXP);
+    Rcpp::traits::input_parameter< double >::type lognu_upperbound(lognu_upperboundSEXP);
+    Rcpp::traits::input_parameter< int >::type n_grid(n_gridSEXP);
+    Rcpp::traits::input_parameter< int >::type n_s(n_sSEXP);
+    Rcpp::traits::input_parameter< double >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< int >::type n_post_samples(n_post_samplesSEXP);
+    rcpp_result_gen = Rcpp::wrap(fitCondPTTcpp(X, Y, Xnew, Ynew, Omega_X, Omega_Y, k_X, k_Y, rho0_X, rho0_Y, rho0_mode_X, rho0_mode_Y, tran_mode, lognu_lowerbound, lognu_upperbound, n_grid, n_s, beta, n_post_samples));
+    return rcpp_result_gen;
+END_RCPP
+}

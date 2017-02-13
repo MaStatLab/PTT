@@ -27,10 +27,16 @@ public:
     //constructors
     GBT(Mat< unsigned int > X, int nobs, int k, int p, double rho0, int rho_mode, int tran_mode, double lognu_lowerbound, double lognu_upperbound, int n_grid, int n_s, double beta);
     ~GBT();
+    void clear();
 
     //main functions
-    int update_node(double *, int, INDEX_TYPE);
     int update();
+
+    void add_data_to_subtree(INDEX_TYPE I, int level, int x_curr, int part_count, Col< unsigned int > obs);
+    void remove_data_from_subtree(INDEX_TYPE I, int level, int x_curr, int part_count, Col< unsigned int > obs);
+    int update_subtree_add_new_data(INDEX_TYPE I, int level, int x_curr, int part_count, Col< unsigned int > new_obs);
+    int update_subtree_remove_new_data(INDEX_TYPE I, int level, int x_curr, int part_count, Col< unsigned int > new_obs);
+
 
     //getters
     double get_root_logrho();
@@ -42,6 +48,7 @@ public:
     void make_prior_logrho_vec(double *logrho_vec,int level, int s);
     void make_posterior_logrho_vec(double *logrho_vec,INDEX_TYPE& I, int level, int s);
     double get_node_logphi(vector<double> &node_INFO);
+
 
     void sample();
     void find_hmap(int print);
@@ -61,23 +68,22 @@ protected:
     vector< pair< pair< INDEX_TYPE, int >, pair< double,double > > > sample_nodes;
     vector< pair< INDEX_TYPE, pair<int,int> > > hmap_nodes;
 
-    void init(Mat< unsigned int > X);
-    void clear();
 
     void sample_subtree(INDEX_TYPE& I,int level,int s, double prob);
     void find_hmap_subtree(INDEX_TYPE& I, int level);
+    void init_prior();
+    int update_node(double *, int, INDEX_TYPE);
 
     double get_add_prob(INDEX_TYPE& I,int i, int t, int level);
     double *get_child(INDEX_TYPE& I, int i,int level,ushort which);
     double *get_node(INDEX_TYPE& I, int level);
 
-    void add_data_to_subtree(INDEX_TYPE I, int level, int x_curr, int part_count, Col< unsigned int > obs);
-    void remove_data_from_subtree(INDEX_TYPE I, int level, int x_curr, int part_count, Col< unsigned int > obs);
-    int update_subtree_add_new_data(INDEX_TYPE I, int level, int x_curr, int part_count, Col< unsigned int > new_obs);
-    int update_subtree_remove_new_data(INDEX_TYPE I, int level, int x_curr, int part_count, Col< unsigned int > new_obs);
 
 private:
+    void init(Mat< unsigned int > X);
     double get_log_Ma(double theta0,int n_0,int n_1,int t);
-
 };
+
+
+
 #endif
