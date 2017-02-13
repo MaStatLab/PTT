@@ -1,7 +1,7 @@
 x=seq(from=0.0001,to=0.9999,by=0.002)
 set.seed(100)
 nobs = 5000
-max.dim=11
+max.resol=11
 size.max = nobs
 
 p1=0.1;p2=0.3;p3=0.4;p4=0.2
@@ -12,8 +12,8 @@ X = as.matrix((sample.ind<=p1)*runif(size.max)+(p1<sample.ind & sample.ind<=p1+p
 true.den = p1*dunif(x) + p2*dunif(x,0.25,0.5) + p3 *4*dbeta((x-0.25)*4,2,2) + p4*dbeta(x,5000,2000)
 
 ## Fit a Markov APT
-ans = apt(X=X,max.dim=max.dim,rho0=0.2)
-pred.den = apt(X=X,Xpred=x,max.dim=max.dim,rho0=0.2)$pred
+ans = apt(X=X,max.resol=max.resol,rho0=0.2)
+pred.den = apt(X=X,Xpred=x,max.resol=max.resol,rho0=0.2)$pred
 
 xlim = c(0,1)
 ylim = c(0,15)
@@ -23,8 +23,8 @@ plot(x,true.den,type='l',lty=2,col='red',xlab="",ylab="",xlim=xlim,ylim=ylim)
 
 
 ## Fit OPT instead
-ans.opt = opt(X=X,max.dim=max.dim,rho0=0.2)
-pred.den.opt = opt(X=X,Xpred=x,max.dim=max.dim,rho0=0.2)$pred
+ans.opt = opt(X=X,max.resol=max.resol,rho0=0.2)
+pred.den.opt = opt(X=X,Xpred=x,max.resol=max.resol,rho0=0.2)$pred
 
 
 xlim = c(0,1)

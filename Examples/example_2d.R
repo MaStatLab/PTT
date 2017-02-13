@@ -23,9 +23,9 @@ true.den = function(xy.grid) { p1*dmvnorm(xy.grid,mean=mean,sigma=sigma) + (1-p1
 true.den.grid = true.den(xy.grid)
 
 n.post.sample=500
-max.dim = 11
+max.resol = 11
 
-markov.apt.2D.fit = apt(X=obs.mat,Xpred=xy.grid,max.dim=max.dim,rho0=0.2,
+markov.apt.2D.fit = apt(X=obs.mat,Xpred=xy.grid,max.resol=max.resol,rho0=0.2,
                         tran.mode=2,beta=0,n.post.samples = n.post.sample)
 
 for (i in 1:n.post.sample) {
@@ -36,7 +36,7 @@ for (i in 1:n.post.sample) {
   part.to.plot = cbind(terminal.part,den = exp(terminal.part[,"logp"])*2^(terminal.part[,"level"]))
   part.to.plot[,2] = part.to.plot[,2]+1
   part.to.plot[,4] = part.to.plot[,4]+1
-  part.to.plot[,1:4] = part.to.plot[,1:4] / 2^max.dim
+  part.to.plot[,1:4] = part.to.plot[,1:4] / 2^max.resol
   colnames(part.to.plot) = c("xmin","xmax","ymin","ymax","level","nu","lopp","den")
 
   xlim=c(0,1)
