@@ -7,6 +7,6 @@ importFrom(graphics, axis, layout, mtext, par, plot,
              points, rect, smoothScatter, title)
 importFrom(grid, gpar)
 import(optimx, igraph)
-export(apt, opt, plot.part, plot.roc)
+export(apt, opt, cond.apt, cond.opt, plot.part, plot.roc)
 
 
