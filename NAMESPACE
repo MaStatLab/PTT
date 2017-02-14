@@ -6,7 +6,7 @@ importFrom(grDevices, colorRampPalette)
 importFrom(graphics, axis, layout, mtext, par, plot,
              points, rect, smoothScatter, title)
 importFrom(grid, gpar)
-import(optimx, igraph)
+import(mvtnorm,optimx, igraph)
 export(apt, opt, cond.apt, cond.opt, plot.part, plot.roc)
 
 
