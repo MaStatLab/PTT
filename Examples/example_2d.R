@@ -14,19 +14,24 @@ mean=c(0.5,0.5);sigma=diag(c(0.01,0.0064))
 mean.local=c(0.8,0.2); sigma.local = sigma/25
 
 
-norm.obs.mat =rmvnorm(n=nobs,mean=mean, sigma=sigma)
-norm.obs.mat.local = rmvnorm(n=nobs, mean=mean.local, sigma=sigma.local)
+norm.obs.mat = mvtnorm::rmvnorm(n=nobs,mean=mean, sigma=sigma)
+norm.obs.mat.local = mvtnorm::rmvnorm(n=nobs, mean=mean.local, sigma=sigma.local)
 
 p1 = 0.85
 obs.mat = (sample.ind < p1) * norm.obs.mat + (sample.ind >= p1 ) * norm.obs.mat.local
 true.den = function(xy.grid) { p1*dmvnorm(xy.grid,mean=mean,sigma=sigma) + (1-p1)*dmvnorm(xy.grid,mean=mean.local,sigma=sigma.local) }
 true.den.grid = true.den(xy.grid)
 
-n.post.sample=500
+n.post.sample=100
 max.resol = 11
 
 markov.apt.2D.fit = apt(X=obs.mat,Xpred=xy.grid,max.resol=max.resol,rho0=0.2,
                         tran.mode=2,beta=0,n.post.samples = n.post.sample)
+
+# ans1 = opt(cbind(rbeta(100,20,20),runif(100)))
+# ans1$part_points_hmap
+
+
 
 for (i in 1:n.post.sample) {
 
