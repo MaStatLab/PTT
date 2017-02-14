@@ -98,7 +98,7 @@ int GBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
     // NODE_CURR[1+t] stores log Z(A,t,x) for t = 0,1,2,...,n_s
     // NODE_CURR[2+n_s+s] stores log phi(A,s,x) for s = 0,1,2,...,n_s-1
 
-    for (s=0; s<n_s; s++) {
+    for (s=0; s<=n_s; s++) {
       t = s;
       NODE_CURR[1+t] = Z[t] = 0; // -DBL_MAX; // NODE_CURR[1+t] stores log Z(A,t,x) for t = 0,1,2,...,n_s
       // In this case Z(A,t,x) for t nonstopping is -inf
@@ -108,17 +108,18 @@ int GBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
   } else if (NODE_CURR[0] <= 1) { // if the node contains no more than 1 data point
 
 
-    if (NODE_CURR[0] == 1) { // if it contains one data point
-      NODE_CURR[1+n_s] = Z[n_s] = (level-k)*log(2.0);
-    }
+      if (NODE_CURR[0] == 1) { // if it contains one data point
+        NODE_CURR[1+n_s] = Z[n_s] = (level-k)*log(2.0);
+      }
 
-    else NODE_CURR[1+n_s] = Z[n_s] = 0; // if it contains no data point
+      else NODE_CURR[1+n_s] = Z[n_s] = 0; // if it contains no data point
 
-    for (t=0; t< n_s; t++) {
-      // in either case, phi(A,s,x) and Z(A,t,x) all correspond to the uniform likelihood
-      s=t;
-      NODE_CURR[2+n_s+s] = NODE_CURR[1+t] = Z[t] = Z[n_s];
-    }
+      for (t=0; t<= n_s; t++) {
+        // in either case, phi(A,s,x) and Z(A,t,x) all correspond to the uniform likelihood
+        s=t;
+        NODE_CURR[2+n_s+s] = NODE_CURR[1+t] = Z[t] = Z[n_s];
+
+      }
 
   } else { // other models need recursion to compute phi and rho
 
@@ -155,13 +156,13 @@ int GBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
 
       for (s = 0; s < n_s; s++) { // for the non-stopping states
 
-	if (t == 0) {
-	  phi[s] = logrho_mat[s][t] + Z[t];
-	}
+	      if (t == 0) {
+	        phi[s] = logrho_mat[s][t] + Z[t];
+	      }
 
-	else {
-	  phi[s] = log_exp_x_plus_exp_y(phi[s], logrho_mat[s][t] + Z[t]);
-	}
+	      else {
+	        phi[s] = log_exp_x_plus_exp_y(phi[s], logrho_mat[s][t] + Z[t]);
+	      }
 
 
       }
@@ -210,7 +211,7 @@ int GBT::update() {
 
 	      I = get_next_node(I,p,level); count++;
       }
-      // cout << "GBT: After update logrho=" << get_root_logrho() << ", logphi=" << get_root_logphi() << endl;
+
     }
 
     return 0;
@@ -234,11 +235,12 @@ void GBT::find_hmap_subtree(INDEX_TYPE& I, int level) {
     else {
       curr_max_state = n_s;
       curr_phi_max = node[2+n_s+n_s];
+
       for(t = 0; t < n_s; t++) {
-	if (node[2+n_s+t] > curr_phi_max) {
-	  curr_max_state = t;
-	  curr_phi_max = node[2+n_s+t];
-	}
+	       if (node[2+n_s+t] > curr_phi_max) {
+	          curr_max_state = t;
+	          curr_phi_max = node[2+n_s+t];
+	       }
       }
 
       // so now the hmap state is curr_max_state
@@ -246,26 +248,26 @@ void GBT::find_hmap_subtree(INDEX_TYPE& I, int level) {
 
       if (curr_max_state < n_s) {
 
-	curr_max_dim = 0;
-	curr_Zj_max = get_add_prob(I,0,curr_max_state,level);
+	      curr_max_dim = 0;
+	      curr_Zj_max = get_add_prob(I,0,curr_max_state,level);
 
-	for (j = 1; j < p; j++) {
-	  curr_Zj = get_add_prob(I,j,curr_max_state,level);
+	      for (j = 1; j < p; j++) {
+	        curr_Zj = get_add_prob(I,j,curr_max_state,level);
 
-	  if (curr_Zj > curr_Zj_max) {
-	    curr_max_dim = j;
-	    curr_Zj_max = curr_Zj;
-	  }
-	}
+	        if (curr_Zj > curr_Zj_max) {
+	          curr_max_dim = j;
+	          curr_Zj_max = curr_Zj;
+	        }
+	    }
 
 
-	INDEX_TYPE child_index_0 = make_child_index(I, curr_max_dim, level, 0);
-	INDEX_TYPE child_index_1 = make_child_index(I, curr_max_dim, level, 1);
+	    INDEX_TYPE child_index_0 = make_child_index(I, curr_max_dim, level, 0);
+	    INDEX_TYPE child_index_1 = make_child_index(I, curr_max_dim, level, 1);
 
-	find_hmap_subtree(child_index_0,level+1);
-	find_hmap_subtree(child_index_1,level+1);
-      }
+	    find_hmap_subtree(child_index_0,level+1);
+	    find_hmap_subtree(child_index_1,level+1);
     }
+  }
 
 }
 
@@ -462,7 +464,7 @@ void GBT::sample() {
 
 }
 
-void GBT::find_hmap(int print = 0) {
+void GBT::find_hmap(int print) {
   INDEX_TYPE I_root = init_index(p,0);
   hmap_nodes.clear();
   find_hmap_subtree(I_root,0);   // the sampled nodes are stored in sample_nodes
@@ -477,7 +479,7 @@ void GBT::find_hmap(int print = 0) {
   }
 }
 
-vector< vector< ushort > > GBT::find_part() {
+vector< vector< ushort > > GBT::find_hmap_part() {
   vector< vector< ushort > > part_points;
   vector< pair<INDEX_TYPE, pair<int,int> > >::iterator it;
   int i;
