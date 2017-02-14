@@ -34,6 +34,7 @@ public:
 
 
   void init(Mat< unsigned int > X, Mat< unsigned int > Y);
+  int update();
   int update_node(double *, int, INDEX_TYPE);
   GBT ** get_node_gbt_ptr(INDEX_TYPE & I, int level);
 

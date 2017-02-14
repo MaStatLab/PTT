@@ -196,8 +196,6 @@ int GBT::update() {
       unsigned count = 0;
       I = init_index(p,level);
 
-
-
       while (count < modelscount[level]) {
 
 	      NODE_CURR = get_node(I,level);
@@ -212,6 +210,7 @@ int GBT::update() {
 
 	      I = get_next_node(I,p,level); count++;
       }
+      // cout << "GBT: After update logrho=" << get_root_logrho() << ", logphi=" << get_root_logphi() << endl;
     }
 
     return 0;

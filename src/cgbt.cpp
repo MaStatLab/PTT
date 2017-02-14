@@ -68,11 +68,10 @@ void CondGBT::init(Mat< unsigned int > X, Mat< unsigned int > Y) {
 void CondGBT::clear() {
 
   for (int i =0; i <= k; i++) {
-    // delete [] models[i];
 
     for (unsigned long long j = 0; j < ((unsigned long long) modelscount[i] << i); j++) {
       if (gbt_ptrs[i][j] != NULL) {
-        gbt_ptrs[i][j]->clear();
+         gbt_ptrs[i][j]->clear();
       }
     }
 
@@ -228,6 +227,39 @@ void CondGBT::sample() {
   sample_subtree(I_root,0,0);   // the sampled nodes are stored in sample_nodes
 }
 
+int CondGBT::update() {
+
+  double *NODE_CURR;
+  INDEX_TYPE I;
+
+  for (int level=k; level>=0;level--) { //do it from the largest models;
+
+    make_prior_logrho_mat(level);
+
+    unsigned count = 0;
+    I = init_index(p,level);
+
+
+
+    while (count < modelscount[level]) {
+
+      NODE_CURR = get_node(I,level);
+
+      for (uint j = 0; j < pow2(level) ; j++) {
+
+        I.var[MAXVAR] = j;
+        update_node(NODE_CURR,level,I);
+        NODE_CURR += NUMNODEVAR;
+
+      }
+
+      I = get_next_node(I,p,level); count++;
+    }
+    // cout << "CondGBT: After update logrho=" << get_root_logrho() << ", logphi=" << get_root_logphi() << endl;
+  }
+
+  return 0;
+}
 
 int CondGBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
 
@@ -242,15 +274,18 @@ int CondGBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
   double Zi;
 
   NODE_CURR_GBT_PTR = get_node_gbt_ptr(I,level);
-  NODE_CURR_GBT_PTR[0]->GBT::update();
+  if (NODE_CURR[0] > 0) {
+    if (NODE_CURR_GBT_PTR[0] == NULL) cout << "Error: Null pointer for non-empty GBT. This shouldn't happen!" << endl;
 
-  if (level == k) { // deepest level allowed, these nodes have prior rho=1
+    NODE_CURR_GBT_PTR[0]->update(); // if there is at least a data point in the node
 
-    NODE_CURR[2] = phi[1] = Z[1] = NODE_CURR_GBT_PTR[0]->get_root_logphi(); // = 0
-    NODE_CURR[1] = Z[0] = 0; // -DBL_MAX; // NODE_CURR[1+t] stores log Z(A,t,x) for t = 0,1,2,...,n_s_x
-    NODE_CURR[3] = Z[1];	    // NODE_CURR[2+n_s_x+s] stores log phi(A,s,x) for s = 0,1,2,...,n_s_x-1
+    if (level == k) { // deepest level allowed, these nodes have prior rho=1
 
-  } else if (NODE_CURR[0] <= 1) { // if the node contains no more than 1 data point
+      NODE_CURR[2] = phi[1] = Z[1] = NODE_CURR_GBT_PTR[0]->get_root_logphi(); // = 0
+      NODE_CURR[1] = Z[0] = 0; // -DBL_MAX; // NODE_CURR[1+t] stores log Z(A,t,x) for t = 0,1,2,...,n_s_x
+      NODE_CURR[3] = Z[1];	    // NODE_CURR[2+n_s_x+s] stores log phi(A,s,x) for s = 0,1,2,...,n_s_x-1
+
+    } else if (NODE_CURR[0] <= 1) { // if the node contains no more than 1 data point
 
     if (NODE_CURR[0] == 1) { // if it contains one data point
       NODE_CURR[2] = phi[1] = Z[1] = NODE_CURR_GBT_PTR[0]->get_root_logphi();
@@ -261,36 +296,44 @@ int CondGBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
     NODE_CURR[3] = NODE_CURR[1] = Z[0] = Z[1];
 
 
-  } else { // other models need recursion to compute phi and rho
+    } else { // other models need recursion to compute phi and rho
 
-    NODE_CURR[2] = Z[1] = NODE_CURR_GBT_PTR[0]->get_root_logphi(); // Z(A,infty,x) can be computed directly
+      NODE_CURR[2] = Z[1] = NODE_CURR_GBT_PTR[0]->get_root_logphi(); // Z(A,infty,x) can be computed directly
 
-    Z[0] = -DBL_MAX;
+      Z[0] = -DBL_MAX;
 
-    for (int i=0; i < p; i++) { // for each dimension i
+      for (int i=0; i < p; i++) { // for each dimension i
 
-      CHILD_0 = get_child(I,i,level,0);
-      CHILD_1 = get_child(I,i,level,1);
+        CHILD_0 = get_child(I,i,level,0);
+        CHILD_1 = get_child(I,i,level,1);
 
-      Zi = loglambda0 + CHILD_0[3] + CHILD_1[3];
+        Zi = loglambda0 + CHILD_0[3] + CHILD_1[3];
 
-      if (Z[0] == -DBL_MAX) {
-        Z[0] = Zi;
-      } else {
-        Z[0] = log_exp_x_plus_exp_y (Z[0], Zi);
+        if (Z[0] == -DBL_MAX) {
+          Z[0] = Zi;
+        } else {
+           Z[0] = log_exp_x_plus_exp_y (Z[0], Zi);
+        }
+
       }
 
+      // Now Z[t] stores Z(A,t,x) for all states t
+      NODE_CURR[1] = Z[0]; // NODE[1+t] stores Z(A,t,x)
+
+      // Next we compute the phi(A,s,x)
+      phi[0] = logrho_mat[0][0] + Z[0];
+      phi[0] = log_exp_x_plus_exp_y(phi[0],logrho_mat[0][1]+Z[1]);
+      phi[1] = Z[1]; // phi(A,infty,x) = Z(A,infty,x)
+      NODE_CURR[3] = phi[0];
     }
-
-    // Now Z[t] stores Z(A,t,x) for all states t
-    NODE_CURR[1] = Z[0]; // NODE[1+t] stores Z(A,t,x)
-
-    // Next we compute the phi(A,s,x)
-    phi[0] = logrho_mat[0][0] + Z[0];
-    phi[0] = log_exp_x_plus_exp_y(phi[0],logrho_mat[0][1]+Z[1]);
-    phi[1] = Z[1]; // phi(A,infty,x) = Z(A,infty,x)
-    NODE_CURR[3] = phi[0];
   }
+
+  else { // if NODE_CURR contains no data, then everything is zero
+    NODE_CURR[2] = phi[0] = phi[1] = Z[1] = 0;
+    NODE_CURR[1] = Z[0] = 0;
+    NODE_CURR[3] = Z[1];
+  }
+
   return 0;
 }
 
@@ -492,7 +535,14 @@ int CondGBT::update_subtree_add_new_data(INDEX_TYPE I, int level, int x_curr, in
   NODE_CURR[0] += 1;
 
   NODE_CURR_GBT_PTR = get_node_gbt_ptr(I,level);
-  NODE_CURR_GBT_PTR[0]->update_subtree_add_new_data(I_GBT,0,1,0,new_obs_Y);
+  if (NODE_CURR_GBT_PTR[0] != NULL) {
+    NODE_CURR_GBT_PTR[0]->update_subtree_add_new_data(I_GBT,0,1,0,new_obs_Y);
+  }
+  else {
+    NODE_CURR_GBT_PTR[0] = new GBT(conv_to< Mat< unsigned int> >::from(new_obs_Y.t()),k_Y,p_Y,rho0_Y,rho0_mode_Y,tran_mode,
+                                   lognu_lowerbound,lognu_upperbound,n_grid,n_s,beta);
+    NODE_CURR_GBT_PTR[0]->update();
+  }
 
   int i;
 
