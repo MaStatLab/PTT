@@ -4,12 +4,13 @@
 using namespace std;
 
 
-CondGBT::CondGBT(Mat< unsigned int > X, Mat< unsigned int> Y, int nobs, int k_X, int k_Y, int p_X, int p_Y,
+CondGBT::CondGBT(Mat< unsigned int > X, Mat< unsigned int> Y, int k_X, int k_Y, int p_X, int p_Y,
                  double rho0_X, double rho0_Y, int rho0_mode_X, int rho0_mode_Y, int tran_mode_Y,
                  double lognu_lowerbound_Y, double lognu_upperbound_Y, int n_grid_Y = 1, int n_s_Y=4, double beta_Y=0.1):
-              GBT(X,nobs,k_X,p_X,rho0_X,rho0_mode_X,tran_mode_Y,lognu_lowerbound_Y,lognu_upperbound_Y,n_grid_Y,1,beta_Y),
+              GBT(X,k_X,p_X,rho0_X,rho0_mode_X,tran_mode_Y,lognu_lowerbound_Y,lognu_upperbound_Y,n_grid_Y,1,beta_Y),
               p_Y(p_Y),k_Y(k_Y),rho0_Y(rho0_Y), rho0_mode_Y(rho0_mode_Y),n_s_Y(n_s_Y) {
 
+         nobs = X.n_rows;
          init(X,Y);
 }
 
@@ -26,6 +27,7 @@ double CondGBT::get_root_logphi() {
 }
 
 double CondGBT::get_root_logrho() {
+  cout << rho0 << "," << models[0][1+n_s] << "," << get_root_logphi() << endl;
   return log(rho0) + models[0][1+n_s] - get_root_logphi();
 }
 
@@ -36,6 +38,7 @@ void CondGBT::init(Mat< unsigned int > X, Mat< unsigned int > Y) {
   models = new double*[k+1];
   modelscount = new unsigned int[k+1];
   gbt_ptrs = new GBT **[k+1];
+
 
   for (i=0; i <= k; i++) {
     modelscount[i] = Choose(p + i - 1, i);
@@ -51,7 +54,6 @@ void CondGBT::init(Mat< unsigned int > X, Mat< unsigned int > Y) {
   }
 
   // step 1: add data into the models
-
   INDEX_TYPE I_root = init_index(p,0);
 
   for (i=0; i < nobs; i++) { //since we do it only once, do this for now
@@ -64,8 +66,9 @@ void CondGBT::init(Mat< unsigned int > X, Mat< unsigned int > Y) {
 }
 
 void CondGBT::clear() {
+
   for (int i =0; i <= k; i++) {
-    delete [] models[i];
+    // delete [] models[i];
 
     for (unsigned long long j = 0; j < ((unsigned long long) modelscount[i] << i); j++) {
       if (gbt_ptrs[i][j] != NULL) {
@@ -76,17 +79,19 @@ void CondGBT::clear() {
     delete [] gbt_ptrs[i];
   }
 
+
+/*
   delete [] models; models = NULL;
-  delete [] modelscount;modelscount= NULL;
+  delete [] modelscount; modelscount= NULL;
 
   for (int s = 0; s < n_s; s++) {
     delete [] logrho_mat[s];
   }
 
   delete [] logrho_mat;
-
   delete [] logrho_vec;
   logrho_mat=NULL;
+*/
 }
 
 GBT ** CondGBT::get_node_gbt_ptr(INDEX_TYPE & I, int level) {
@@ -237,7 +242,11 @@ int CondGBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
   double Zi;
 
   NODE_CURR_GBT_PTR = get_node_gbt_ptr(I,level);
-  NODE_CURR_GBT_PTR[0]->update();
+  // cout << NODE_CURR_GBT_PTR << "," << NODE_CURR_GBT_PTR[0]->nobs << "," << NODE_CURR_GBT_PTR[0]->get_root_logrho() << "," << NODE_CURR_GBT_PTR[0]->get_root_logphi() << endl;
+
+  NODE_CURR_GBT_PTR[0]->GBT::update();
+
+  // cout << NODE_CURR_GBT_PTR << "," << NODE_CURR_GBT_PTR[0]->nobs << "," << NODE_CURR_GBT_PTR[0]->get_root_logrho() << "," << NODE_CURR_GBT_PTR[0]->get_root_logphi() << endl;
 
   if (level == k) { // deepest level allowed, these nodes have prior rho=1
 
@@ -289,14 +298,16 @@ int CondGBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
   return 0;
 }
 
+
 /* The following implementation of CondGBT::update_node should match the results above */
 /*
 int CondGBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
 
 double *CHILD_0;
 double *CHILD_1;
+GBT ** NODE_CURR_GBT_PTR;
 
-NODE_CURR_GBT_PTR[0]->get_node_gbt_ptr(I,level);
+NODE_CURR_GBT_PTR = get_node_gbt_ptr(I,level);
 NODE_CURR_GBT_PTR[0]->update();
 
 double Z[n_s+1]; // Z is a vector of length n_s + 1, that stores log Z(A,t,x) for the current node A
@@ -405,20 +416,26 @@ void CondGBT::add_data_to_subtree(INDEX_TYPE I, int level, int x_curr, int part_
   GBT ** NODE_CURR_GBT_PTR;
 
   INDEX_TYPE I_child;
-  INDEX_TYPE I_GBT = init_index(p_Y,0);
+
 
   NODE_CURR = get_node(I,level);
-  NODE_CURR[0] += 1;
-
   NODE_CURR_GBT_PTR = get_node_gbt_ptr(I,level);
 
+  NODE_CURR[0] += 1;
+
+  INDEX_TYPE I_GBT_root = init_index(p_Y,0);
+
   if (NODE_CURR[0] == 1) {
-    NODE_CURR_GBT_PTR[0] = new GBT(obs_Y.t(),1,k_Y,p_Y,rho0_Y,rho0_mode_Y,tran_mode,
+    cout << "k_Y = " << k_Y << endl;
+    NODE_CURR_GBT_PTR[0] = new GBT(conv_to< Mat< unsigned int> >::from(obs_Y.t()),k_Y,p_Y,rho0_Y,rho0_mode_Y,tran_mode,
                                    lognu_lowerbound,lognu_upperbound,n_grid,n_s,beta); // need to specify initial values
   }
 
   else {
-    NODE_CURR_GBT_PTR[0]->add_data_to_subtree(I_GBT,0,1,0,obs_Y);
+
+    NODE_CURR_GBT_PTR[0]->add_data_to_subtree(I_GBT_root,0,1,0,obs_Y);
+    (NODE_CURR_GBT_PTR[0]->nobs)++;
+
   }
 
   int i = 0;

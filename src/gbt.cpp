@@ -65,14 +65,13 @@ void GBT::make_prior_logrho_mat(int level) { // logrho_mat is the n_s*(n_s+1) lo
 }
 
 
-GBT::GBT(Mat< unsigned int > X,int nobs, int k, int p, double rho0, int rho_mode, int tran_mode,
+GBT::GBT(Mat< unsigned int > X,int k, int p, double rho0, int rho_mode, int tran_mode,
          double lognu_lowerbound, double lognu_upperbound, int n_grid = 1, int n_s=4, double beta=0.1):
-        nobs(nobs), p(p), k(k), rho0(rho0),n_s(n_s), rho_mode(rho_mode), tran_mode(tran_mode), beta(beta),
+        p(p), k(k), rho0(rho0),n_s(n_s), rho_mode(rho_mode), tran_mode(tran_mode), beta(beta),
         lognu_lowerbound(lognu_lowerbound),lognu_upperbound(lognu_upperbound), n_grid(n_grid) {
 
-
+    nobs = X.n_rows;
     init(X);
-
 }
 
 
@@ -187,14 +186,14 @@ int GBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
 
 
 int GBT::update() {
-
-
+    cout << "k=" << k << ", p=" << p << endl;
     double *NODE_CURR;
     INDEX_TYPE I;
 
     for (int level=k; level>=0;level--) { //do it from the largest models;
 
       make_prior_logrho_mat(level);
+      // cout << get_root_logrho() << "," << get_root_logphi() << endl;
 
       unsigned count = 0;
       I = init_index(p,level);
@@ -216,7 +215,7 @@ int GBT::update() {
 
       }
     }
-
+    cout << get_root_logrho() << "," << get_root_logphi() << endl;
     return 0;
 }
 
@@ -641,6 +640,8 @@ void GBT::add_data_to_subtree(INDEX_TYPE I, int level, int x_curr, int part_coun
   NODE_CURR = get_node(I,level);
 
   NODE_CURR[0] += 1;
+
+  cout << level << "," << NODE_CURR[0] << endl;
 
   int i = 0;
 

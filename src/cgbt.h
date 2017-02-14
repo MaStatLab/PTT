@@ -4,25 +4,20 @@
 #include "helpers.h"
 #include "gbt.h"
 
-class CondGBT: public GBT {
+class CondGBT {
 public:
   GBT ***gbt_ptrs;
-  int nobs;
-  int k,k_Y;
-  int p,p_Y;
-  int n_s,n_s_Y;
-  double rho0,rho0_Y;
-  int rho0_mode,rho0_mode_Y;
-  int tran_mode;
-  double lognu_lowerbound, lognu_upperbound;
-  int n_grid;
-  double beta;
+  int k_Y;
+  int p_Y;
+  int n_s_Y;
+  double rho0_Y;
+  int rho0_mode_Y;
 
   double get_root_logrho();
   double get_root_logphi();
   // tran_mode, n_s, n_grid,lognu_lowerbound, lognu_upperbound, beta are all for Y only now as they are not needed for X
 
-  CondGBT(Mat< unsigned int > X, Mat< unsigned int> Y, int nobs, int k_X, int k_Y, int p_X, int p_Y,
+  CondGBT(Mat< unsigned int > X, Mat< unsigned int> Y, int k_X, int k_Y, int p_X, int p_Y,
                    double rho0_X, double rho0_Y, int rho0_mode_X, int rho0_mode_Y, int tran_mode_Y,
                    double lognu_lowerbound_Y, double lognu_upperbound_Y, int n_grid_Y, int n_s_Y, double beta_Y);
   ~CondGBT();

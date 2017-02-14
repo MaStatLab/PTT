@@ -25,7 +25,7 @@ public:
     double *logrho_vec;
 
     //constructors
-    GBT(Mat< unsigned int > X, int nobs, int k, int p, double rho0, int rho_mode, int tran_mode, double lognu_lowerbound, double lognu_upperbound, int n_grid, int n_s, double beta);
+    GBT(Mat< unsigned int > X, int k, int p, double rho0, int rho_mode, int tran_mode, double lognu_lowerbound, double lognu_upperbound, int n_grid, int n_s, double beta);
     ~GBT();
     void clear();
 

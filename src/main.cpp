@@ -49,7 +49,6 @@ Rcpp::List fitPTTcpp(
     }
 
     GBT my_gbt(X_binary,
-               nobs,
                k,
                p,
                rho0,
@@ -110,6 +109,9 @@ Rcpp::List fitPTTcpp(
       part_points_post_samples_R = Rcpp::List::create();
       nu_and_prob_post_samples_R = Rcpp::List::create();
     }
+
+    part_points_post_samples_R = Rcpp::List::create();
+    nu_and_prob_post_samples_R = Rcpp::List::create();
 
     return Rcpp::List::create(
       Rcpp::Named("logrho") = logrho,
@@ -172,7 +174,6 @@ Rcpp::List fitCondPTTcpp( // conditional Polya tree type models
 
   CondGBT my_cgbt(X_binary,
                   Y_binary,
-                  nobs,
                   k_X,
                   k_Y,
                   p_X,
@@ -190,15 +191,19 @@ Rcpp::List fitCondPTTcpp( // conditional Polya tree type models
   );
 
 
+
   my_cgbt.update();
 
 
   // outputs to return
-  vector< vector< ushort > > part_points_vec = my_cgbt.find_part(); // the HMAP partition
+
   double logphi = my_cgbt.get_root_logphi(); // log marginal likelihood
   double logrho = my_cgbt.get_root_logrho(); // log posterior stopping probability on the root
 
   vector<double> predictive_densities_vec;
+
+  vector< vector< ushort > > part_points_vec = my_cgbt.find_part(); // the HMAP partition
+
 
   if (nobs_new > 0) {
     Mat<unsigned int> Xnew_binary(nobs_new,p_X);
@@ -223,8 +228,11 @@ Rcpp::List fitCondPTTcpp( // conditional Polya tree type models
   // if (n_post_sample > 0) { // use n_post_sample posterior samples
   // inclusion_probs = my_cgbt.estimate_incl_prob(n_post_sample); //to estimate inclusion probabilities
   // }
+
+
   Rcpp::List part_points_post_samples_R;
   Rcpp::List nu_and_prob_post_samples_R;
+
 
   if (n_post_samples > 0) {
     vector< vector< vector<ushort> > > part_points_post_samples(n_post_samples);
@@ -246,6 +254,7 @@ Rcpp::List fitCondPTTcpp( // conditional Polya tree type models
     part_points_post_samples_R = Rcpp::List::create();
     nu_and_prob_post_samples_R = Rcpp::List::create();
   }
+
 
   return Rcpp::List::create(
     Rcpp::Named("logrho") = logrho,
