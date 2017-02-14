@@ -4,7 +4,7 @@
 #include "helpers.h"
 #include "gbt.h"
 
-class CondGBT {
+class CondGBT: public GBT {
 public:
   GBT ***gbt_ptrs;
   int k_Y;
