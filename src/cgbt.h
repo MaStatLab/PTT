@@ -30,6 +30,9 @@ public:
   void sample_subtree(INDEX_TYPE& I,int level,int s);
   void sample();
 
+  void find_hmap(int print=0);
+  void find_hmap_subtree(INDEX_TYPE& I, int level);
+
   vector<double> compute_predictive_density(Mat< unsigned int >Xnew, Mat< unsigned int >Ynew);
 
 

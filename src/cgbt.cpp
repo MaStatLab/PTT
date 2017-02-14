@@ -146,6 +146,74 @@ void CondGBT::sample_subtree(INDEX_TYPE& I,int level,int s) {
   }
 }
 
+
+void CondGBT::find_hmap(int print) {
+  INDEX_TYPE I_root = init_index(p,0);
+  hmap_nodes.clear();
+  find_hmap_subtree(I_root,0);   // the sampled nodes are stored in sample_nodes
+  if (print) { // print the sampled nodes
+    vector< pair<INDEX_TYPE, pair<int,int> > >::iterator it;
+    for (it = hmap_nodes.begin(); it < hmap_nodes.end(); it++) {
+      print_index(it->first, it->second.first);
+      cout << endl;
+      print_index_2(it->first, it->second.first, k);
+      cout << endl;
+    }
+  }
+}
+
+void CondGBT::find_hmap_subtree(INDEX_TYPE& I, int level) {
+
+  int j,t;
+  double *node = get_node(I,level);
+  double logrho0 = log(make_rho0(level));
+
+  int curr_max_state, curr_max_dim;
+  double curr_phi_max, curr_Zj_max, curr_Zj;
+
+  if (level == k) { // stopping?
+    hmap_nodes.push_back(make_pair(I,make_pair(level,n_s+1)));
+  }
+
+  else {
+    curr_max_state = n_s;
+    curr_phi_max = node[2+n_s+n_s];
+
+    for(t = 0; t < n_s; t++) {
+      if (node[2+n_s+t] > curr_phi_max) {
+        curr_max_state = t;
+        curr_phi_max = node[2+n_s+t];
+      }
+    }
+
+    // so now the hmap state is curr_max_state
+    hmap_nodes.push_back(make_pair(I, make_pair(level,curr_max_state+1)));
+
+    if (curr_max_state < n_s) {
+
+      curr_max_dim = 0;
+      curr_Zj_max = get_add_prob(I,0,curr_max_state,level);
+
+      for (j = 1; j < p; j++) {
+        curr_Zj = get_add_prob(I,j,curr_max_state,level);
+
+        if (curr_Zj > curr_Zj_max) {
+          curr_max_dim = j;
+          curr_Zj_max = curr_Zj;
+        }
+      }
+
+
+      INDEX_TYPE child_index_0 = make_child_index(I, curr_max_dim, level, 0);
+      INDEX_TYPE child_index_1 = make_child_index(I, curr_max_dim, level, 1);
+
+      find_hmap_subtree(child_index_0,level+1);
+      find_hmap_subtree(child_index_1,level+1);
+    }
+  }
+
+}
+
 double CondGBT::get_add_prob(INDEX_TYPE& I,int i, int t, int level) { //get the splitting probability of dimension i
   double *node = get_node(I,level);
   double loglambda0 = (-1.0) * log((double) p);
@@ -154,6 +222,7 @@ double CondGBT::get_add_prob(INDEX_TYPE& I,int i, int t, int level) { //get the 
 
   return exp( loglambda0 + CHILD_0[2+n_s] + CHILD_1[2+n_s] - node[1]);
 }
+
 
 /*
 int CondGBT::find_sample_part(vector< vector< ushort > > &part_points) {
@@ -255,11 +324,11 @@ int CondGBT::update() {
 
       I = get_next_node(I,p,level); count++;
     }
-    // cout << "CondGBT: After update logrho=" << get_root_logrho() << ", logphi=" << get_root_logphi() << endl;
   }
 
   return 0;
 }
+
 
 int CondGBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
 
@@ -287,13 +356,13 @@ int CondGBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
 
     } else if (NODE_CURR[0] <= 1) { // if the node contains no more than 1 data point
 
-    if (NODE_CURR[0] == 1) { // if it contains one data point
-      NODE_CURR[2] = phi[1] = Z[1] = NODE_CURR_GBT_PTR[0]->get_root_logphi();
-    }
+      if (NODE_CURR[0] == 1) { // if it contains one data point
+        NODE_CURR[2] = phi[1] = Z[1] = NODE_CURR_GBT_PTR[0]->get_root_logphi();
+      }
 
-    else NODE_CURR[2] = Z[1] = 0; // if it contains no data point
+      else NODE_CURR[2] = Z[1] = 0; // if it contains no data point
 
-    NODE_CURR[3] = NODE_CURR[1] = Z[0] = Z[1];
+      NODE_CURR[4] = NODE_CURR[3] = NODE_CURR[1] = Z[0] = Z[1];
 
 
     } else { // other models need recursion to compute phi and rho
@@ -325,14 +394,20 @@ int CondGBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
       phi[0] = log_exp_x_plus_exp_y(phi[0],logrho_mat[0][1]+Z[1]);
       phi[1] = Z[1]; // phi(A,infty,x) = Z(A,infty,x)
       NODE_CURR[3] = phi[0];
+
     }
+
+    NODE_CURR[3] = phi[0];
+    NODE_CURR[4] = phi[1];
   }
 
   else { // if NODE_CURR contains no data, then everything is zero
     NODE_CURR[2] = phi[0] = phi[1] = Z[1] = 0;
     NODE_CURR[1] = Z[0] = 0;
     NODE_CURR[3] = Z[1];
+    NODE_CURR[4] = 0;
   }
+
 
   return 0;
 }
@@ -342,109 +417,115 @@ int CondGBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
 /*
 int CondGBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
 
-double *CHILD_0;
-double *CHILD_1;
-GBT ** NODE_CURR_GBT_PTR;
+  double *CHILD_0;
+  double *CHILD_1;
+  GBT ** NODE_CURR_GBT_PTR;
 
-NODE_CURR_GBT_PTR = get_node_gbt_ptr(I,level);
-NODE_CURR_GBT_PTR[0]->update();
+  NODE_CURR_GBT_PTR = get_node_gbt_ptr(I,level);
+  NODE_CURR_GBT_PTR[0]->update();
 
-double Z[n_s+1]; // Z is a vector of length n_s + 1, that stores log Z(A,t,x) for the current node A
-double phi[n_s+1]; // phi is a vector of length n_s, that stores log phi(A,s,x) for the current node A for s=0,1,2,...,n_s
-// note that for s = stopping state, by design phi(A,s,x) = Z(A,s,x), which is stored in Z[n_s].
+  double Z[n_s+1]; // Z is a vector of length n_s + 1, that stores log Z(A,t,x) for the current node A
+  double phi[n_s+1]; // phi is a vector of length n_s, that stores log phi(A,s,x) for the current node A for s=0,1,2,...,n_s
+  // note that for s = stopping state, by design phi(A,s,x) = Z(A,s,x), which is stored in Z[n_s].
 
-double Zi;
-int t,s; // nonstopping state
+  double Zi;
+  int t,s; // nonstopping state
 
-if (level == k) { // deepest level allowed, these nodes have prior rho=1
+  if (NODE_CURR[0] == 0) {
+    for (s=1; s<= 2+2*n_s; s++) {
+      NODE_CURR[s] = 0;
+    }
+  }
 
-NODE_CURR[1+n_s] = phi[n_s] = Z[n_s] = NODE_CURR_GBT_PTR[0]->get_root_logphi(); // = 0
-// NODE_CURR[1+n_s] = phi[n_s] = Z[n_s] = NODE_CURR[0]*(level-k)*log(2.0); // = 0
-// NODE_CURR[1+t] stores log Z(A,t,x) for t = 0,1,2,...,n_s
-// NODE_CURR[2+n_s+s] stores log phi(A,s,x) for s = 0,1,2,...,n_s-1
+  else {
+    if (NODE_CURR_GBT_PTR[0] == NULL) cout << "Error: Null pointer for non-empty GBT. This shouldn't happen!" << endl;
 
-for (s=0; s<n_s; s++) {
-t = s;
-NODE_CURR[1+t] = Z[t] = 0; // -DBL_MAX; // NODE_CURR[1+t] stores log Z(A,t,x) for t = 0,1,2,...,n_s
-// In this case Z(A,t,x) for t nonstopping is -inf
-NODE_CURR[2+n_s+s] = Z[n_s];	    // NODE_CURR[2+n_s+s] stores log phi(A,s,x) for s = 0,1,2,...,n_s-1
-}
+    if (level == k) { // deepest level allowed, these nodes have prior rho=1
 
-} else if (NODE_CURR[0] <= 1) { // if the node contains no more than 1 data point
+      NODE_CURR[1+n_s] = phi[n_s] = Z[n_s] = NODE_CURR_GBT_PTR[0]->get_root_logphi(); // = 0
+      // NODE_CURR[1+n_s] = phi[n_s] = Z[n_s] = NODE_CURR[0]*(level-k)*log(2.0); // = 0
+      // NODE_CURR[1+t] stores log Z(A,t,x) for t = 0,1,2,...,n_s
+      // NODE_CURR[2+n_s+s] stores log phi(A,s,x) for s = 0,1,2,...,n_s-1
 
+      for (s=0; s<n_s; s++) {
+        t = s;
+        NODE_CURR[1+t] = Z[t] = 0; // -DBL_MAX; // NODE_CURR[1+t] stores log Z(A,t,x) for t = 0,1,2,...,n_s
+        // In this case Z(A,t,x) for t nonstopping is -inf
+        NODE_CURR[2+n_s+s] = Z[n_s];	    // NODE_CURR[2+n_s+s] stores log phi(A,s,x) for s = 0,1,2,...,n_s-1
+      }
 
-if (NODE_CURR[0] == 1) { // if it contains one data point
-NODE_CURR[1+n_s] = Z[n_s] = NODE_CURR_GBT_PTR[0]->get_root_logphi();
-}
-
-else NODE_CURR[1+n_s] = Z[n_s] = 0; // if it contains no data point
-
-for (t=0; t< n_s; t++) {
-// in either case, phi(A,s,x) and Z(A,t,x) all correspond to the uniform likelihood
-s=t;
-NODE_CURR[2+n_s+s] = NODE_CURR[1+t] = Z[t] = Z[n_s];
-}
-
-} else { // other models need recursion to compute phi and rho
-
-NODE_CURR[1+n_s] = Z[n_s] = NODE_CURR_GBT_PTR[0]->get_root_logphi(); // Z(A,infty,x) can be computed directly
-
-for (t=0; t < n_s; t++) { // non-stopping states
-
-Z[t] = -DBL_MAX;
-
-for (int i=0; i < p; i++) { // for each dimension i
-
-CHILD_0 = get_child(I,i,level,0);
-CHILD_1 = get_child(I,i,level,1);
+    } else if (NODE_CURR[0] <= 1) { // if the node contains no more than 1 data point
 
 
-Zi = loglambda0
-+ CHILD_0[2+n_s+t] + CHILD_1[2+n_s+t];
+        if (NODE_CURR[0] == 1) { // if it contains one data point
+          NODE_CURR[1+n_s] = Z[n_s] = NODE_CURR_GBT_PTR[0]->get_root_logphi();
+        }
+
+        else NODE_CURR[1+n_s] = Z[n_s] = 0; // if it contains no data point
+
+        for (t=0; t< n_s; t++) {
+          // in either case, phi(A,s,x) and Z(A,t,x) all correspond to the uniform likelihood
+          s=t;
+          NODE_CURR[2+n_s+s] = NODE_CURR[1+t] = Z[t] = Z[n_s];
+        }
+
+    } else { // other models need recursion to compute phi and rho
+
+        NODE_CURR[1+n_s] = Z[n_s] = NODE_CURR_GBT_PTR[0]->get_root_logphi(); // Z(A,infty,x) can be computed directly
+
+        for (t=0; t < n_s; t++) { // non-stopping states
+
+          Z[t] = -DBL_MAX;
+
+          for (int i=0; i < p; i++) { // for each dimension i
+
+            CHILD_0 = get_child(I,i,level,0);
+            CHILD_1 = get_child(I,i,level,1);
 
 
-if (Z[t] == -DBL_MAX) {
-Z[t] = Zi;
-} else {
-Z[t] = log_exp_x_plus_exp_y (Z[t], Zi);
-}
-}
+            Zi = loglambda0 + CHILD_0[2+n_s+t] + CHILD_1[2+n_s+t];
 
 
-// Now Z[t] stores Z(A,t,x) for all states t
-NODE_CURR[1+t] = Z[t]; // NODE[1+t] stores Z(A,t,x)
+            if (Z[t] == -DBL_MAX) {
+              Z[t] = Zi;
+            } else {
+              Z[t] = log_exp_x_plus_exp_y (Z[t], Zi);
+            }
+          }
 
 
-// Next we compute the phi(A,s,x)
-
-for (s = 0; s < n_s; s++) { // for the non-stopping states
-
-if (t == 0) {
-phi[s] = logrho_mat[s][t] + Z[t];
-}
-
-else {
-phi[s] = log_exp_x_plus_exp_y(phi[s], logrho_mat[s][t] + Z[t]);
-}
+          // Now Z[t] stores Z(A,t,x) for all states t
+          NODE_CURR[1+t] = Z[t]; // NODE[1+t] stores Z(A,t,x)
 
 
-}
-}
+          // Next we compute the phi(A,s,x)
 
-for (s=0; s < n_s; s++) {
-phi[s] = log_exp_x_plus_exp_y(phi[s],logrho_mat[s][n_s]+Z[n_s]);
-}
+          for (s = 0; s < n_s; s++) { // for the non-stopping states
 
-phi[n_s] = Z[n_s]; // phi(A,infty,x) = Z(A,infty,x)
+            if (t == 0) {
+              phi[s] = logrho_mat[s][t] + Z[t];
+            }
 
-for (s=0; s<=n_s; s++) {
+            else {
+              phi[s] = log_exp_x_plus_exp_y(phi[s], logrho_mat[s][t] + Z[t]);
+            }
+          }
+        }
 
-NODE_CURR[2+n_s+s] = phi[s];
+        for (s=0; s < n_s; s++) {
+          phi[s] = log_exp_x_plus_exp_y(phi[s],logrho_mat[s][n_s]+Z[n_s]);
+        }
 
-}
+        phi[n_s] = Z[n_s]; // phi(A,infty,x) = Z(A,infty,x)
 
-}
-return 0;
+        for (s=0; s<=n_s; s++) {
+
+          NODE_CURR[2+n_s+s] = phi[s];
+        }
+    }
+  }
+
+  return 0;
 }
 */
 

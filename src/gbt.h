@@ -51,11 +51,9 @@ public:
 
 
     void sample();
-    void find_hmap(int print);
-
     vector<double> compute_predictive_density(Mat< unsigned int >Xnew);
-
-    vector< vector< ushort > > find_part();
+    void find_hmap(int print=0);
+    vector< vector< ushort > > find_hmap_part();
     int find_sample_part(vector< vector< ushort > > &part_points, vector< vector< double > > &nu_and_probs);
 
     //working variables

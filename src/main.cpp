@@ -63,7 +63,8 @@ Rcpp::List fitPTTcpp(
     my_gbt.update();
 
 // outputs to return
-    vector< vector< ushort > > part_points_vec = my_gbt.find_part(); // the HMAP partition
+    my_gbt.find_hmap();
+    vector< vector< ushort > > part_points_vec = my_gbt.find_hmap_part(); // the HMAP partition
     double logphi = my_gbt.get_root_logphi(); // log marginal likelihood
     double logrho = my_gbt.get_root_logrho(); // log posterior stopping probability on the root
 
@@ -200,7 +201,8 @@ Rcpp::List fitCondPTTcpp( // conditional Polya tree type models
 
   vector<double> predictive_densities_vec;
 
-  vector< vector< ushort > > part_points_vec = my_cgbt.find_part(); // the HMAP partition
+  my_cgbt.find_hmap();
+  vector< vector< ushort > > part_points_vec = my_cgbt.find_hmap_part(); // the HMAP partition
 
 
   if (nobs_new > 0) {
