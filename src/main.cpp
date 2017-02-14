@@ -90,6 +90,7 @@ Rcpp::List fitPTTcpp(
     Rcpp::List nu_and_prob_post_samples_R;
 
     if (n_post_samples > 0) {
+
       vector< vector< vector<ushort> > > part_points_post_samples(n_post_samples);
       vector< vector< vector<double> > > nu_and_prob_post_samples(n_post_samples);
 
@@ -109,9 +110,6 @@ Rcpp::List fitPTTcpp(
       part_points_post_samples_R = Rcpp::List::create();
       nu_and_prob_post_samples_R = Rcpp::List::create();
     }
-
-    part_points_post_samples_R = Rcpp::List::create();
-    nu_and_prob_post_samples_R = Rcpp::List::create();
 
     return Rcpp::List::create(
       Rcpp::Named("logrho") = logrho,
