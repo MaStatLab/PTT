@@ -6,7 +6,7 @@ Author: Li Ma (Jacopo Soriano and Quanli Wang contributed to some of the code.)
 Maintainer: Li Ma <li.ma@duke.edu>
 Description: This package implements several Bayesian nonparametric models that generalize the Polya tree process
 License: GPL >= 3
-Imports: Rcpp (>= 0.11.0), igraph, optimx, grid
+Imports: Rcpp (>= 0.11.0), mvtnorm,igraph, optimx, grid
 Suggests: KernSmooth
 LinkingTo: Rcpp, RcppArmadillo
 NeedsCompilation: yes

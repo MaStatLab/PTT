@@ -28,6 +28,12 @@ apt = function( X, Xpred = NULL, Omega.type = "unit", max.resol = 10, rho0=0.2, 
 
   ans = fitPTTcpp(X,Xpred,Omega,max.resol,rho0,rho0.mode,tran.mode,lognu.lb,lognu.ub,n.grid,n.s,beta,n.post.samples)
 
+  part.hmap = matrix(unlist(ans$part_points_hmap),byrow=TRUE,ncol=2*p+2)
+  colnames(part.hmap)[2*p+(1:2)] = c("level","state")
+  part.hmap[part.hmap[,"state"] == n.s+1, "state"] = Inf
+
+  ans[which(names(ans) == "part_points_hmap")][[1]] = part.hmap
+
   if (n.post.samples > 0) {
     for (i in 1:n.post.samples) {
       part.post.sample = matrix(unlist(ans$part_points_post_samples[[i]]),byrow=TRUE,ncol=2*p+1)

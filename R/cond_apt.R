@@ -48,6 +48,12 @@ cond.apt = function( X, Y, Xpred = NULL, Ypred=NULL, OmegaX.type = "unit", Omega
 
   ans = fitCondPTTcpp(X,Y,Xpred,Ypred,OmegaX,OmegaY,max.resX,max.resY,rho0.X,rho0.mode.X,rho0.Y,rho0.mode.Y,
                       tran.mode,lognu.lb,lognu.ub,n.grid,n.s,beta,n.post.samples)
+  part.hmap = matrix(unlist(ans$part_points_hmap),byrow=TRUE,ncol=2*p.X+2)
+
+  colnames(part.hmap)[2*p.X+(1:2)] = c("level","state")
+  part.hmap[part.hmap[,"state"] == 2,"state"] = Inf
+  print(part.hmap)
+  ans[which(names(ans) == "part_points_hmap")][[1]] = part.hmap
 
   if (n.post.samples > 0) {
     for (i in 1:n.post.samples) {
