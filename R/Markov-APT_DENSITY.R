@@ -10,7 +10,7 @@ apt = function( X, Xpred = NULL, Omega.type = "unit", max.resol = 10, rho0=0.2, 
 
   } else if(Omega.type == "standardized") {
 
-    Omega = t(apply(X,2,range))
+    Omega = t(apply(rbind(X,Xpred),2,range))
     Omega[,2] = Omega[,2]*1.00001
   }
   else
@@ -72,7 +72,7 @@ cond.apt = function( X, Y, Xpred = NULL, Ypred=NULL, OmegaX.type = "unit", Omega
 
   } else if(OmegaX.type == "standardized") {
 
-    OmegaX = t(apply(X,2,range))
+    OmegaX = t(apply(rbind(X,Xpred),2,range))
     OmegaX[,2] = OmegaX[,2]*1.00001
   }
   else
@@ -87,7 +87,7 @@ cond.apt = function( X, Y, Xpred = NULL, Ypred=NULL, OmegaX.type = "unit", Omega
 
   } else if(OmegaY.type == "standardized") {
 
-    OmegaY = t(apply(Y,2,range))
+    OmegaY = t(apply(rbind(Y,Ypred),2,range))
     OmegaY[,2] = OmegaY[,2]*1.00001
   }
   else
