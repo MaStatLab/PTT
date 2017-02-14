@@ -176,7 +176,6 @@ int GBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
     for (s=0; s<=n_s; s++) {
 
       NODE_CURR[2+n_s+s] = phi[s];
-
     }
 
   }
@@ -186,17 +185,18 @@ int GBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
 
 
 int GBT::update() {
-    cout << "k=" << k << ", p=" << p << endl;
+
     double *NODE_CURR;
     INDEX_TYPE I;
 
     for (int level=k; level>=0;level--) { //do it from the largest models;
 
       make_prior_logrho_mat(level);
-      // cout << get_root_logrho() << "," << get_root_logphi() << endl;
 
       unsigned count = 0;
       I = init_index(p,level);
+
+
 
       while (count < modelscount[level]) {
 
@@ -211,11 +211,9 @@ int GBT::update() {
 	      }
 
 	      I = get_next_node(I,p,level); count++;
-
-
       }
     }
-    cout << get_root_logrho() << "," << get_root_logphi() << endl;
+
     return 0;
 }
 
@@ -641,8 +639,6 @@ void GBT::add_data_to_subtree(INDEX_TYPE I, int level, int x_curr, int part_coun
 
   NODE_CURR[0] += 1;
 
-  cout << level << "," << NODE_CURR[0] << endl;
-
   int i = 0;
 
   if (level < k) { // not maximum (leaf) node
@@ -840,7 +836,9 @@ void GBT::clear() {
 
 
 double GBT::get_root_logrho() {
-  return log(rho0) + models[0][1+n_s] - (get_root_logphi()-models[0][0]*k*log(2.0));
+
+  // return log(rho0) + models[0][1+n_s] - (get_root_logphi()-models[0][0]*k*log(2.0));
+  return log(make_rho0(0)) + models[0][1+n_s] - (get_root_logphi()-models[0][0]*k*log(2.0));
 }
 
 double GBT::get_root_logphi() {

@@ -58,9 +58,6 @@ public:
     vector< vector< ushort > > find_part();
     int find_sample_part(vector< vector< ushort > > &part_points, vector< vector< double > > &nu_and_probs);
 
-protected:
-    //data
-
     //working variables
     double **models;
     unsigned int *modelscount;
@@ -78,8 +75,6 @@ protected:
     double *get_child(INDEX_TYPE& I, int i,int level,ushort which);
     double *get_node(INDEX_TYPE& I, int level);
 
-
-private:
     void init(Mat< unsigned int > X);
     double get_log_Ma(double theta0,int n_0,int n_1,int t);
 };

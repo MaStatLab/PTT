@@ -135,15 +135,15 @@ Rcpp::List fitCondPTTcpp( // conditional Polya tree type models
     int k_X = 5,
     int k_Y = 5,
     double rho0_X = 0.2,
-    double rho0_Y = 0.2,
     int rho0_mode_X = 0,
+    double rho0_Y = 0.2,
     int rho0_mode_Y = 0,
-    int tran_mode = 1,
-    double lognu_lowerbound = -1, // lowerbound for log shrinkage parameter
-    double lognu_upperbound = 4, // upperbound for log shrinkage parameter
-    int n_grid = 5, // number of grid points for computing the marginal likelihood
-    int n_s = 5, // number of non-stopping shrinkages states
-    double beta = 0, // kernel hyparameter for the transition probabilities; default beta = 0 indicating uniform
+    int tran_mode_Y = 1,
+    double lognu_lowerbound_Y = -1, // lowerbound for log shrinkage parameter
+    double lognu_upperbound_Y = 4, // upperbound for log shrinkage parameter
+    int n_grid_Y = 5, // number of grid points for computing the marginal likelihood
+    int n_s_Y = 5, // number of non-stopping shrinkages states
+    double beta_Y = 0, // kernel hyparameter for the transition probabilities; default beta = 0 indicating uniform
     int n_post_samples = 0 // number of posterior samples
 )
 {
@@ -182,12 +182,12 @@ Rcpp::List fitCondPTTcpp( // conditional Polya tree type models
                   rho0_mode_X,
                   rho0_Y,
                   rho0_mode_Y,
-                  tran_mode,
-                  lognu_lowerbound,
-                  lognu_upperbound,
-                  n_grid,
-                  n_s,
-                  beta
+                  tran_mode_Y,
+                  lognu_lowerbound_Y,
+                  lognu_upperbound_Y,
+                  n_grid_Y,
+                  n_s_Y,
+                  beta_Y
   );
 
 

@@ -5,7 +5,7 @@ using namespace std;
 
 
 CondGBT::CondGBT(Mat< unsigned int > X, Mat< unsigned int> Y, int k_X, int k_Y, int p_X, int p_Y,
-                 double rho0_X, double rho0_Y, int rho0_mode_X, int rho0_mode_Y, int tran_mode_Y,
+                 double rho0_X, int rho0_mode_X, double rho0_Y, int rho0_mode_Y, int tran_mode_Y,
                  double lognu_lowerbound_Y, double lognu_upperbound_Y, int n_grid_Y = 1, int n_s_Y=4, double beta_Y=0.1):
               GBT(X,k_X,p_X,rho0_X,rho0_mode_X,tran_mode_Y,lognu_lowerbound_Y,lognu_upperbound_Y,n_grid_Y,1,beta_Y),
               p_Y(p_Y),k_Y(k_Y),rho0_Y(rho0_Y), rho0_mode_Y(rho0_mode_Y),n_s_Y(n_s_Y) {
@@ -20,15 +20,15 @@ CondGBT::~CondGBT() {
 
 double CondGBT::get_root_logphi() {
 
-  double log_root_phi;
-  log_root_phi = models[0][2+n_s];
+  return models[0][2+n_s];
+  // return GBT::get_root_logphi() - models[0][0] * k * log(2.0);
 
-  return log_root_phi;
 }
 
 double CondGBT::get_root_logrho() {
-  cout << rho0 << "," << models[0][1+n_s] << "," << get_root_logphi() << endl;
-  return log(rho0) + models[0][1+n_s] - get_root_logphi();
+
+  // return log(make_rho0(0)) + models[0][2] - get_root_logphi();
+  return GBT::get_root_logrho();
 }
 
 void CondGBT::init(Mat< unsigned int > X, Mat< unsigned int > Y) {
@@ -242,11 +242,7 @@ int CondGBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
   double Zi;
 
   NODE_CURR_GBT_PTR = get_node_gbt_ptr(I,level);
-  // cout << NODE_CURR_GBT_PTR << "," << NODE_CURR_GBT_PTR[0]->nobs << "," << NODE_CURR_GBT_PTR[0]->get_root_logrho() << "," << NODE_CURR_GBT_PTR[0]->get_root_logphi() << endl;
-
   NODE_CURR_GBT_PTR[0]->GBT::update();
-
-  // cout << NODE_CURR_GBT_PTR << "," << NODE_CURR_GBT_PTR[0]->nobs << "," << NODE_CURR_GBT_PTR[0]->get_root_logrho() << "," << NODE_CURR_GBT_PTR[0]->get_root_logphi() << endl;
 
   if (level == k) { // deepest level allowed, these nodes have prior rho=1
 
@@ -426,7 +422,7 @@ void CondGBT::add_data_to_subtree(INDEX_TYPE I, int level, int x_curr, int part_
   INDEX_TYPE I_GBT_root = init_index(p_Y,0);
 
   if (NODE_CURR[0] == 1) {
-    cout << "k_Y = " << k_Y << endl;
+
     NODE_CURR_GBT_PTR[0] = new GBT(conv_to< Mat< unsigned int> >::from(obs_Y.t()),k_Y,p_Y,rho0_Y,rho0_mode_Y,tran_mode,
                                    lognu_lowerbound,lognu_upperbound,n_grid,n_s,beta); // need to specify initial values
   }

@@ -58,7 +58,7 @@ opt = function( X, Xpred = NULL, Omega.type = "unit", max.resol = 10, rho0=0.2, 
 
 ## Fitting a conditional APT
 cond.apt = function( X, Y, Xpred = NULL, Ypred=NULL, OmegaX.type = "unit", OmegaY.type = "unit", max.resX = 5, max.resY=8,
-                     rho0.X=0.2, rho0.Y=0.2, rho0.mode.X = 0, rho0.mode.Y = 0,
+                     rho0.X=0.2, rho0.mode.X = 0, rho0.Y=0.2, rho0.mode.Y = 0,
                      tran.mode=1,lognu.lb=-1, lognu.ub=4, n.grid=5, n.s=5,beta=0.1,n.post.samples=0)
 {
 
@@ -104,7 +104,7 @@ cond.apt = function( X, Y, Xpred = NULL, Ypred=NULL, OmegaX.type = "unit", Omega
     Ypred = as.matrix(Ypred)
   }
 
-  ans = fitCondPTTcpp(X,Y,Xpred,Ypred,OmegaX,OmegaY,max.resX,max.resY,rho0.X,rho0.Y,rho0.mode.X,rho0.mode.Y,
+  ans = fitCondPTTcpp(X,Y,Xpred,Ypred,OmegaX,OmegaY,max.resX,max.resY,rho0.X,rho0.mode.X,rho0.Y,rho0.mode.Y,
                       tran.mode,lognu.lb,lognu.ub,n.grid,n.s,beta,n.post.samples)
 
   if (n.post.samples > 0) {
@@ -129,10 +129,10 @@ cond.apt = function( X, Y, Xpred = NULL, Ypred=NULL, OmegaX.type = "unit", Omega
 
 ## Fitting a conditional OPT
 cond.opt = function( X, Y, Xpred = NULL, Ypred=NULL, OmegaX.type = "unit", OmegaY.type = "unit", max.resX = 7, max.resY=7,
-                     rho0.X=0.2, rho0.Y=0.2, rho0.mode.X = 0, rho0.mode.Y = 0, tran.mode=1,
+                     rho0.X=0.2, rho0.mode.X = 0, rho0.Y=0.2, rho0.mode.Y = 0, tran.mode=1,
                      lognu.lb=-1, lognu.ub=4, n.grid=5, n.s=5,beta=0.1,n.post.samples=0){
 
-  ans = cond.apt(X,Y,Xpred,Ypred,OmegaX.type,OmegaY.type,max.resX,max.resY,rho0.X,rho0.Y,rho0.mode.X,rho0.mode.Y,
+  ans = cond.apt(X,Y,Xpred,Ypred,OmegaX.type,OmegaY.type,max.resX,max.resY,rho0.X,rho0.mode.X,rho0.Y,rho0.mode.Y,
                  tran.mode=1,lognu.lb=0, lognu.ub=0, n.grid=1, n.s=1,beta=0,n.post.samples=n.post.samples)
 
   return(ans)

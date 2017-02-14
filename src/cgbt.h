@@ -18,7 +18,7 @@ public:
   // tran_mode, n_s, n_grid,lognu_lowerbound, lognu_upperbound, beta are all for Y only now as they are not needed for X
 
   CondGBT(Mat< unsigned int > X, Mat< unsigned int> Y, int k_X, int k_Y, int p_X, int p_Y,
-                   double rho0_X, double rho0_Y, int rho0_mode_X, int rho0_mode_Y, int tran_mode_Y,
+                   double rho0_X, int rho0_mode_X, double rho0_Y, int rho0_mode_Y, int tran_mode_Y,
                    double lognu_lowerbound_Y, double lognu_upperbound_Y, int n_grid_Y, int n_s_Y, double beta_Y);
   ~CondGBT();
   void clear();
@@ -32,12 +32,11 @@ public:
 
   vector<double> compute_predictive_density(Mat< unsigned int >Xnew, Mat< unsigned int >Ynew);
 
-protected:
+
   void init(Mat< unsigned int > X, Mat< unsigned int > Y);
   int update_node(double *, int, INDEX_TYPE);
   GBT ** get_node_gbt_ptr(INDEX_TYPE & I, int level);
-private:
- // double get_log_Ma(double theta0,int n_0,int n_1,int t) {return 0;};
+
 };
 
 #endif
