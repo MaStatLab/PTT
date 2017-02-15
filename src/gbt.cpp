@@ -278,12 +278,12 @@ void GBT::make_prior_logrho_vec(double *logrho_vec, int level, int s) {
   double gam[n_s+1]; // total number of states must be no more than 50
   double unnormalized_rho[n_s+1];
 
-  if (s == n_s) { // if the parent is in the pruned state then the child must also be pruned
+  if (s == n_s || level == k) { // if the parent is in the pruned state then the child must also be pruned
     for (t = 0; t < n_s; t++) {
 
-      logrho_vec[t] = 0;
+      logrho_vec[t] = log(0); // -DBL_MAX;
     }
-    logrho_vec[n_s] = 1;
+    logrho_vec[n_s] = 0;
   }
 
   else {
@@ -292,30 +292,30 @@ void GBT::make_prior_logrho_vec(double *logrho_vec, int level, int s) {
       logrho_vec[n_s] = log(make_rho0(level));
 
       if (level == 0 || tran_mode== 0 ) {   // tran mode 0 --- no stochastic ordering. uniform over non-pruning states
-	for (t = 0; t < n_s; t++) {
+	      for (t = 0; t < n_s; t++) {
 
-	  gam[t] = 1.0/n_s;
-	}
+	      gam[t] = 1.0/n_s;
+	      }
       }
 
       if (tran_mode == 1 && level > 0) { // tran mode 1 --- with stochastic ordering. kernel specification over non-pruning states
 
-	cumulative_rho = 0;
-	for (t = 0; t < n_s; t++) {
-	  if (t < s) unnormalized_rho[t] = 0;
-	  else unnormalized_rho[t] = exp(-beta*abs(s-t));
-	  cumulative_rho += unnormalized_rho[t];
-	}
+	      cumulative_rho = 0;
+	      for (t = 0; t < n_s; t++) {
+	        if (t < s) unnormalized_rho[t] = 0;
+	        else unnormalized_rho[t] = exp(-beta*abs(s-t));
+	        cumulative_rho += unnormalized_rho[t];
+	      }
 
-	for (t = 0; t < n_s; t++) {
-	  if (t<s) gam[t] = 0;
-	  else gam[t] = unnormalized_rho[t]/cumulative_rho;
-	}
+	      for (t = 0; t < n_s; t++) {
+	        if (t<s) gam[t] = 0;
+	        else gam[t] = unnormalized_rho[t]/cumulative_rho;
+	      }
       }
 
       for (t = 0; t < n_s; t++) {
 
-	logrho_vec[t] = log((1-exp(logrho_vec[n_s])) * gam[t]);
+	      logrho_vec[t] = log((1-exp(logrho_vec[n_s])) * gam[t]);
 
 
       }
@@ -324,35 +324,35 @@ void GBT::make_prior_logrho_vec(double *logrho_vec, int level, int s) {
     else { // if tran_mode 2 ---  with stochastic ordering. kernel specification for both pruning and non-pruning states. no differentiation between pruning and non-pruning states. in this case rho0 and rho0_mode are not used.
       if (level == 0) {
 
-	for (t = 0; t < n_s+1; t++) {
+	      for (t = 0; t < n_s+1; t++) {
 
-	  logrho_vec[t] = -log(n_s+1);
-	}
+	        logrho_vec[t] = -log(n_s+1);
+	      }
       }
 
 
       else {
 
-	cumulative_rho = 0;
+	      cumulative_rho = 0;
 
-	for (t = 0; t < n_s+1; t++) {
-	  if (t < s) unnormalized_rho[t] = 0;
-	  else unnormalized_rho[t] = exp(-beta*abs(s-t));
-	  cumulative_rho += unnormalized_rho[t];
-	}
+	      for (t = 0; t < n_s+1; t++) {
+	        if (t < s) unnormalized_rho[t] = 0;
+	        else unnormalized_rho[t] = exp(-beta*abs(s-t));
+	        cumulative_rho += unnormalized_rho[t];
+	      }
 
-	for (t = 0; t < n_s+1; t++) {
-	  if (t<s) gam[t] = 0;
-	  else gam[t] = unnormalized_rho[t]/cumulative_rho;
-	}
-
-
-	for (t = 0; t < n_s+1; t++) {
-
-	  logrho_vec[t] = log(gam[t]);
+	      for (t = 0; t < n_s+1; t++) {
+	        if (t<s) gam[t] = 0;
+	        else gam[t] = unnormalized_rho[t]/cumulative_rho;
+	      }
 
 
-	}
+	      for (t = 0; t < n_s+1; t++) {
+
+	        logrho_vec[t] = log(gam[t]);
+
+
+	      }
       }
     }
   }
