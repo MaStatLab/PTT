@@ -202,7 +202,7 @@ Rcpp::List fitCondPTTcpp( // conditional Polya tree type models
   vector<double> predictive_densities_vec;
 
   my_cgbt.find_hmap();
-  vector< vector< ushort > > part_points_vec = my_cgbt.find_hmap_part(); // the HMAP partition
+  pair< vector< vector< ushort > >, vector< double > > part_points_vec = my_cgbt.find_hmap_part(); // the HMAP partition
 
 
   if (nobs_new > 0) {
@@ -259,7 +259,8 @@ Rcpp::List fitCondPTTcpp( // conditional Polya tree type models
   return Rcpp::List::create(
     Rcpp::Named("logrho") = logrho,
     Rcpp::Named("logphi") = logphi,
-    Rcpp::Named("part_points_hmap") = part_points_vec,
+    Rcpp::Named("part_points_hmap") = part_points_vec.first,
+    Rcpp::Named("rhos_hmap") = part_points_vec.second,
     Rcpp::Named("predictive_densities") = predictive_densities_vec,
     Rcpp::Named("part_points_post_samples") = part_points_post_samples_R,
     Rcpp::Named("nu_and_prob_post_samples") = nu_and_prob_post_samples_R

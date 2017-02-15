@@ -32,6 +32,7 @@ public:
 
   void find_hmap(int print=0);
   void find_hmap_subtree(INDEX_TYPE& I, int level);
+  pair< vector< vector< ushort > >, vector< double > > find_hmap_part();
 
   vector<double> compute_predictive_density(Mat< unsigned int >Xnew, Mat< unsigned int >Ynew);
 
