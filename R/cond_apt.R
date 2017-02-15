@@ -52,8 +52,12 @@ cond.apt = function( X, Y, Xpred = NULL, Ypred=NULL, OmegaX.type = "unit", Omega
 
   colnames(part.hmap)[2*p.X+(1:2)] = c("level","state")
   part.hmap[part.hmap[,"state"] == 2,"state"] = Inf
-  print(part.hmap)
-  ans[which(names(ans) == "part_points_hmap")][[1]] = part.hmap
+  # print(part.hmap)
+
+  rhos.hmap = matrix(unlist(ans$rhos_hmap),byrow=TRUE,ncol=1)
+  colnames(rhos.hmap)[1] = c("rho")
+  ans[which(names(ans) == "part_points_hmap")][[1]] = cbind(part.hmap,rhos.hmap)
+  ans[which(names(ans) == "rhos_hmap")] = NULL
 
   if (n.post.samples > 0) {
     for (i in 1:n.post.samples) {
