@@ -214,6 +214,75 @@ void CondGBT::find_hmap_subtree(INDEX_TYPE& I, int level) {
 
 }
 
+pair< vector< vector< ushort > >, vector< double > > CondGBT::find_hmap_part() {
+  vector< vector< ushort > > part_points;
+  vector< double > hmap_rhos;
+
+  vector< pair<INDEX_TYPE, pair<int,int> > >::iterator it;
+  int i;
+  vector< ushort > v(2*p+2);
+
+  INDEX_TYPE I;
+  int level;
+  int state;
+
+  ushort x_curr = 0;
+  ushort index_prev_var = 0;
+  ushort lower = 0;
+  ushort x_curr_count = -1;
+
+  find_hmap(0);
+
+  for (it = hmap_nodes.begin(); it < hmap_nodes.end(); it++) {
+
+    I = it->first;
+    level = it->second.first;
+    state = it->second.second;
+    v[2*p] = level;
+    v[2*p+1] = state;
+
+    for (i = 0; i < p; i++) {
+      v[2*i] = 0;
+      v[2*i+1] = ((ushort) 1 << k) - 1;
+    }
+
+    x_curr = 0;
+    index_prev_var = 0;
+    lower = 0;
+    x_curr_count = -1;
+
+    for (i = 0; i < level; i++) {
+      if ( I.var[i] - index_prev_var - 1 > 0 ) { // next variable
+
+        v[2*x_curr] = lower;
+        v[2*x_curr+1] = lower + ((ushort) 1 << (k-x_curr_count-1)) - 1;
+
+        lower = 0;
+        x_curr_count = 0;
+      }
+      else {
+        x_curr_count++;
+      }
+
+      x_curr += I.var[i] - index_prev_var - 1;
+      lower |= (((I.var[MAXVAR] >> i) & (ushort) 1)) << (k-x_curr_count-1);
+
+      index_prev_var = I.var[i];
+    }
+
+    v[2*x_curr] = lower;
+    v[2*x_curr+1] = lower + ((ushort) 1 << (k-x_curr_count-1)) - 1;
+
+    part_points.push_back(v);
+
+    make_posterior_logrho_vec(logrho_vec,I,level,0);
+    hmap_rhos.push_back(exp(logrho_vec[n_s]));
+  }
+
+  return make_pair(part_points,hmap_rhos);
+}
+
+
 double CondGBT::get_add_prob(INDEX_TYPE& I,int i, int t, int level) { //get the splitting probability of dimension i
   double *node = get_node(I,level);
   double loglambda0 = (-1.0) * log((double) p);
@@ -350,14 +419,14 @@ int CondGBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
 
     if (level == k) { // deepest level allowed, these nodes have prior rho=1
 
-      NODE_CURR[2] = phi[1] = Z[1] = NODE_CURR_GBT_PTR[0]->get_root_logphi(); // = 0
+      NODE_CURR[2] = phi[0] = phi[1] = Z[1] = NODE_CURR_GBT_PTR[0]->get_root_logphi(); // = 0
       NODE_CURR[1] = Z[0] = 0; // -DBL_MAX; // NODE_CURR[1+t] stores log Z(A,t,x) for t = 0,1,2,...,n_s_x
       NODE_CURR[3] = Z[1];	    // NODE_CURR[2+n_s_x+s] stores log phi(A,s,x) for s = 0,1,2,...,n_s_x-1
 
     } else if (NODE_CURR[0] <= 1) { // if the node contains no more than 1 data point
 
       if (NODE_CURR[0] == 1) { // if it contains one data point
-        NODE_CURR[2] = phi[1] = Z[1] = NODE_CURR_GBT_PTR[0]->get_root_logphi();
+        NODE_CURR[2] = phi[0] = phi[1] = Z[1] = NODE_CURR_GBT_PTR[0]->get_root_logphi();
       }
 
       else NODE_CURR[2] = Z[1] = 0; // if it contains no data point
@@ -411,6 +480,8 @@ int CondGBT::update_node(double *NODE_CURR, int level, INDEX_TYPE I) {
 
   return 0;
 }
+
+
 
 
 /* The following implementation of CondGBT::update_node should match the results above */
