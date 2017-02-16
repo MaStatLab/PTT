@@ -29,7 +29,7 @@ apt = function( X, Xpred = NULL, Omega.type = "unit", max.resol = 10, rho0=0.2, 
   ans = fitPTTcpp(X,Xpred,Omega,max.resol,rho0,rho0.mode,tran.mode,lognu.lb,lognu.ub,n.grid,n.s,beta,n.post.samples)
 
   part.hmap = matrix(unlist(ans$part_points_hmap),byrow=TRUE,ncol=2*p+2)
-  colnames(part.hmap)[2*p+(1:2)] = c("level","state")
+  colnames(part.hmap) = c(paste(rep(paste("X",1:p,sep=""),rep(2,p)),c(".l",".u"),sep=""),"level","state")
   part.hmap[part.hmap[,"state"] == n.s+1, "state"] = Inf
 
   ans[which(names(ans) == "part_points_hmap")][[1]] = part.hmap
@@ -37,7 +37,7 @@ apt = function( X, Xpred = NULL, Omega.type = "unit", max.resol = 10, rho0=0.2, 
   if (n.post.samples > 0) {
     for (i in 1:n.post.samples) {
       part.post.sample = matrix(unlist(ans$part_points_post_samples[[i]]),byrow=TRUE,ncol=2*p+1)
-      colnames(part.post.sample)[2*p+1] = "level"
+      colnames(part.post.sample) = c(paste(rep(paste("X",1:p,sep=""),rep(2,p)),c(".l",".u"),sep=""),"level")
       nu.post.sample = matrix(unlist(ans$nu_and_prob_post_samples[[i]]),byrow=TRUE,ncol=2)
       colnames(nu.post.sample) = c("nu","logp")
 

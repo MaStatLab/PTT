@@ -49,8 +49,7 @@ cond.apt = function( X, Y, Xpred = NULL, Ypred=NULL, OmegaX.type = "unit", Omega
   ans = fitCondPTTcpp(X,Y,Xpred,Ypred,OmegaX,OmegaY,max.resX,max.resY,rho0.X,rho0.mode.X,rho0.Y,rho0.mode.Y,
                       tran.mode,lognu.lb,lognu.ub,n.grid,n.s,beta,n.post.samples)
   part.hmap = matrix(unlist(ans$part_points_hmap),byrow=TRUE,ncol=2*p.X+2)
-
-  colnames(part.hmap)[2*p.X+(1:2)] = c("level","state")
+  colnames(part.hmap) = c(paste(rep(paste("X",1:p.X,sep=""),rep(2,p.X)),c(".l",".u"),sep=""),"level","state")
   part.hmap[part.hmap[,"state"] == 2,"state"] = Inf
   # print(part.hmap)
 
@@ -62,7 +61,8 @@ cond.apt = function( X, Y, Xpred = NULL, Ypred=NULL, OmegaX.type = "unit", Omega
   if (n.post.samples > 0) {
     for (i in 1:n.post.samples) {
       part.post.sample = matrix(unlist(ans$part_points_post_samples[[i]]),byrow=TRUE,ncol=2*p.X+1)
-      colnames(part.post.sample)[2*p.X+1] = "level"
+      colnames(part.post.sample) = c(paste(rep(paste("X",1:p.X,sep=""),rep(2,p.X)),c(".l",".u"),sep=""),"level")
+
       nu.post.sample = matrix(unlist(ans$nu_and_prob_post_samples[[i]]),byrow=TRUE,ncol=2)
       colnames(nu.post.sample) = c("nu","logp")
 
