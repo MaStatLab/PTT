@@ -1,7 +1,6 @@
 #ifndef HELPERS_H
 #define HELPERS_H
 
-#define NUMNODEVAR 25
 #define MAXVAR 15  // down no more than 14 levels
 #include <RcppArmadillo.h>
 #include <vector>

@@ -6,6 +6,8 @@
 
 class GBT {
 public:
+
+    int numnodevar;
     //data dimmensions
     int nobs;   //number of observations
     int p;      //total number of predictors
@@ -36,8 +38,7 @@ public:
     void remove_data_from_subtree(INDEX_TYPE I, int level, int x_curr, int part_count, Col< unsigned int > obs);
     int update_subtree_add_new_data(INDEX_TYPE I, int level, int x_curr, int part_count, Col< unsigned int > new_obs);
     int update_subtree_remove_new_data(INDEX_TYPE I, int level, int x_curr, int part_count, Col< unsigned int > new_obs);
-
-
+    unsigned int get_node_index(INDEX_TYPE& I,int level);
     //getters
     double get_root_logrho();
     double get_root_logphi();

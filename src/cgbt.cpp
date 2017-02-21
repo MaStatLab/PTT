@@ -42,12 +42,12 @@ void CondGBT::init(Mat< unsigned int > X, Mat< unsigned int > Y) {
 
   for (i=0; i <= k; i++) {
     modelscount[i] = Choose(p + i - 1, i);
-    models[i] = new double[(unsigned long long) (modelscount[i]*NUMNODEVAR) << i];
+    models[i] = new double[(unsigned long long) (modelscount[i]*numnodevar) << i];
     gbt_ptrs[i] = new GBT *[(unsigned long long) modelscount[i] << i];
 
     for (j=0; j < modelscount[i] ; j++) {
       for (l=0; l < pow2(i); l++) {
-        models[i][(j*pow2(i)+l)*NUMNODEVAR] = 0; // Initialize NODE_CURR[0] to 0
+        models[i][(j*pow2(i)+l)*numnodevar] = 0; // Initialize NODE_CURR[0] to 0
         gbt_ptrs[i][j*pow2(i)+l] = NULL;
       }
     }
@@ -94,7 +94,7 @@ void CondGBT::clear() {
 }
 
 GBT ** CondGBT::get_node_gbt_ptr(INDEX_TYPE & I, int level) {
-  return &gbt_ptrs[level][get_node_index(I,level)/NUMNODEVAR];
+  return &gbt_ptrs[level][get_node_index(I,level)/numnodevar];
 }
 
 void CondGBT::sample_subtree(INDEX_TYPE& I,int level,int s) {
@@ -387,7 +387,7 @@ int CondGBT::update() {
 
         I.var[MAXVAR] = j;
         update_node(NODE_CURR,level,I);
-        NODE_CURR += NUMNODEVAR;
+        NODE_CURR += numnodevar;
 
       }
 

@@ -84,23 +84,7 @@ unsigned int Choose(int n, int k) {
   return c  / d;
 }
 
-unsigned int get_node_index(INDEX_TYPE& I,int level){
-  unsigned long long  r = 0;
 
-  unsigned long long numerator = 1;
-  unsigned long long denominator = 1;
-
-  for (int i = 0; i < level; i++) {
-    numerator = 1;
-    denominator *= (i+1);
-    for (int j = 1; j <= i+1; j++) {
-      numerator *= I.var[i]-j;
-    }
-    r += numerator / denominator;
-  }
-
-  return NUMNODEVAR*(r*pow2(level) + (unsigned long long) I.var[MAXVAR]);
-}
 
 INDEX_TYPE init_index(int n,int level) {
   INDEX_TYPE init;

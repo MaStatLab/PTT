@@ -70,6 +70,7 @@ GBT::GBT(Mat< unsigned int > X,int k, int p, double rho0, int rho_mode, int tran
         p(p), k(k), rho0(rho0),n_s(n_s), rho_mode(rho_mode), tran_mode(tran_mode), beta(beta),
         lognu_lowerbound(lognu_lowerbound),lognu_upperbound(lognu_upperbound), n_grid(n_grid) {
 
+    numnodevar = 2*n_s+3;
     nobs = X.n_rows;
     init(X);
 }
@@ -205,7 +206,7 @@ int GBT::update() {
 
 	      I.var[MAXVAR] = j;
  	      update_node(NODE_CURR,level,I);
-	      NODE_CURR += NUMNODEVAR;
+	      NODE_CURR += numnodevar;
 
 	      }
 
@@ -610,6 +611,23 @@ int GBT::find_sample_part(vector< vector< ushort > > &part_points, vector< vecto
   return part_points.size();
 }
 
+unsigned int GBT::get_node_index(INDEX_TYPE& I,int level){
+  unsigned long long  r = 0;
+
+  unsigned long long numerator = 1;
+  unsigned long long denominator = 1;
+
+  for (int i = 0; i < level; i++) {
+    numerator = 1;
+    denominator *= (i+1);
+    for (int j = 1; j <= i+1; j++) {
+      numerator *= I.var[i]-j;
+    }
+    r += numerator / denominator;
+  }
+
+  return numnodevar*(r*pow2(level) + (unsigned long long) I.var[MAXVAR]);
+}
 
 double GBT::get_add_prob(INDEX_TYPE& I,int i, int t, int level) { //get the splitting probability of dimension i
     double *node = get_node(I,level);
@@ -779,11 +797,11 @@ void GBT::init(Mat< unsigned int > X) {
 
     for (i=0; i <= k; i++) {
         modelscount[i] = Choose(p + i - 1, i);
-        models[i] = new double[(unsigned long long) (modelscount[i]*NUMNODEVAR) << i];
+        models[i] = new double[(unsigned long long) (modelscount[i]*numnodevar) << i];
 
 	    for (j=0; j < modelscount[i] ; j++) {
 	        for (l=0; l < pow2(i); l++) {
-	          models[i][(j*pow2(i)+l)*NUMNODEVAR] = 0; // Initialize NODE_CURR[0] to 0
+	          models[i][(j*pow2(i)+l)*numnodevar] = 0; // Initialize NODE_CURR[0] to 0
 	        }
 	    }
     }
