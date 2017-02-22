@@ -21,7 +21,7 @@ For details see examples.
 
 Ma L. (2016) Adaptive shrinkage in Polya tree type models. Bayesian Analysis. doi:10.1214/16-BA1021
 
-Ma L. (2016) Recursive partitioning and multi-scale modeling on conditional densities. https://arxiv.org/abs/1611.04538
+Ma L. (2017) Recursive partitioning and multi-scale modeling on conditional densities. https://arxiv.org/abs/1611.04538
 
 Wong WH and Ma L. (2010) Optional Polya tree and Bayesian inference. Annals of Statistics. doi:10.1214/09-AOS755
 
