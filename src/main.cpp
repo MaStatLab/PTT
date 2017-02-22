@@ -33,6 +33,11 @@ Rcpp::List fitPTTcpp(
     int nobs = X.n_rows;
     int nobs_new = Xnew.n_rows;
 
+    if (k > MAXVAR - 1) {
+      cout << "Warning: maximum resolution " << k << " exceeds limit " << MAXVAR-1 << ". Set to " << MAXVAR - 1 << "." << endl;
+      k = MAXVAR - 1;
+    }
+
     // constants for rescaling the observations according to the sample space
     vec a = 1.0 / (Omega.col(1) - Omega.col(0));
     vec b = - Omega.col(0) % a;
@@ -150,6 +155,17 @@ Rcpp::List fitCondPTTcpp( // conditional Polya tree type models
   int p_Y = Y.n_cols;
   int nobs = X.n_rows;
   int nobs_new = Xnew.n_rows;
+
+
+  if (k_X > MAXVAR - 1) {
+    cout << "Warning: maximum resolution for X " << k_X << " exceeds limit " << MAXVAR-1 << ". Set to " << MAXVAR - 1 << "." << endl;
+    k_X = MAXVAR - 1;
+  }
+
+  if (k_Y > MAXVAR - 1) {
+    cout << "Warning: maximum resolution for Y " << k_Y << " exceeds limit " << MAXVAR-1 << ". Set to " << MAXVAR - 1 << "." << endl;
+    k_Y = MAXVAR - 1;
+  }
 
   vec a_X = 1.0 / (Omega_X.col(1) - Omega_X.col(0));
   vec b_X = - Omega_X.col(0) % a_X;
