@@ -1,7 +1,13 @@
-plot.part=function(xy.part,border=FALSE,xlim=c(0,1), ylim=c(0,1), zlim=extendrange(xy.part[,"den"]), main="" ,nlevels=100,color.fun=terrain.colors,plot.scale=TRUE,color=NA) {
+plot.part=function(xy.part,border=FALSE,xlim=c(0,1), ylim=c(0,1), zlim=extendrange(xy.part[,"den"]), main="" ,nlevels=100,plot.den=TRUE,color.fun=terrain.colors,plot.scale=TRUE,color=NA) {
   if (zlim[1] < 0) zlim[1]=0
 
-  colors = rev(color.fun(nlevels))
+  if (plot.den) {
+    colors = rev(color.fun(nlevels))
+  }
+  
+  else {
+    colors = rep("#FFFFFFFF",nlevels)
+  }
   fill.colors = colors[round((zlim[2]-xy.part[,"den"])/(zlim[2]-zlim[1])*nlevels)]
   if (border) border.col = "black" else border.col=fill.colors
   graphic.params=gpar(col=border.col,xlim=xlim,ylim=ylim,fill=fill.colors)
