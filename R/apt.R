@@ -54,7 +54,7 @@ apt = function( X, Xpred = NULL, Omega.type = "unit", max.resol = 10, rho0=0.2, 
 }
 
 ## Fitting an optional Polya tree model
-opt = function( X, Xpred = NULL, Omega.type = "unit", max.resol = 10, rho0=0.2, rho0.mode = 0, n.post.samples=0) {
+opt = function( X, Xpred = NULL, Omega.type = "unit", max.resol = 10, rho0=0.5, rho0.mode = 0, n.post.samples=0) {
 
   ans = apt(X=X, Xpred=Xpred, Omega.type=Omega.type, max.resol=max.resol, rho0=rho0, rho0.mode = rho0.mode,tran.mode=1,
                            lognu.lb=0, lognu.ub=0, n.grid=1, n.s=1,beta=0,n.post.samples=n.post.samples)
