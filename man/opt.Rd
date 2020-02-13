@@ -17,14 +17,15 @@ opt(X, Xpred = NULL, Omega.type = "unit", max.resol = 10, rho0=0.5, rho0.mode = 
   \item{Xpred}{Matrix of locations in the sample space where posterior predictive density is to be computed.}
 
   \item{Omega.type}{Specifies the type of samples space. Under the default \code{"unit"} option, the sample space is the unit rectangle [0,1]^k where k is the number of dimensions (i.e., the number of columns in \code{X}. Under the \code{"standardized"} option, the sample space is a hypercube defined by the empirical range of each dimension of \code{X}.}
+
+
+  \item{max.resol}{The maximum resolution level of the partition tree. The default is \code{10}. The maximum is \code{14}.}
+
+  \item{rho0.mode}{The way prior probability for complete shrinkage (i.e., the stopping state) is specified. The default is \code{rho0.mode=0} under which the prior probability for complete shrinkage is the same constant \code{rho0} for all nodes in the partition. If \code{rho0.mode=1} then the probability grows to 1 with the level of the node quadratically: \code{1-(1-rho0)^k}, where k is the level of the node. If \code{rho0.mode=2} then the probability grows to 1 with the level of the node exponentially:
+
+
+  \item{n.post.samples}{The number of posterior samples to be drawn.}
 }
-
-\item{max.resol}{The maximum resolution level of the partition tree. The default is \code{10}. The maximum is \code{14}.}
-
-\item{rho0.mode}{The way prior probability for complete shrinkage (i.e., the stopping state) is specified. The default is \code{rho0.mode=0} under which the prior probability for complete shrinkage is the same constant \code{rho0} for all nodes in the partition. If \code{rho0.mode=1} then the probability grows to 1 with the level of the node quadratically: \code{1-(1-rho0)^k}, where k is the level of the node. If \code{rho0.mode=2} then the probability grows to 1 with the level of the node exponentially:
-
-
-\item{n.post.samples}{The number of posterior samples to be drawn.}
 
 \details{
 %%  ~~ If necessary, more details than the description above ~~
