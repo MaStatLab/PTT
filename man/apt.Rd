@@ -16,25 +16,25 @@ apt( X, Xpred = NULL, Omega.type = "unit", max.resol = 10, rho0=0.2, rho0.mode =
   \item{Xpred}{Matrix of locations in the sample space where posterior predictive density is to be computed.}
 
   \item{Omega.type}{Specifies the type of samples space. Under the default \code{"unit"} option, the sample space is the unit rectangle [0,1]^k where k is the number of dimensions (i.e., the number of columns in \code{X}. Under the \code{"standardized"} option, the sample space is a hypercube defined by the empirical range of each dimension of \code{X}.}
+
+  \item{max.resol}{The maximum resolution level of the partition tree. The default is \code{10}. The maximum is \code{14}.}
+
+  \item{rho0.mode}{The way prior probability for complete shrinkage (i.e., the stopping state) is specified. The default is \code{rho0.mode=0} under which the prior probability for complete shrinkage is the same constant \code{rho0} for all nodes in the partition. If \code{rho0.mode=1} then the probability grows to 1 with the level of the node quadratically: \code{1-(1-rho0)^k}, where k is the level of the node. If \code{rho0.mode=2} then the probability grows to 1 with the level of the node exponentially:
+
+  \item{rho0}{Prior probability for complete shrinkage.}
+
+  \item{tran.mode}{Type of shrinkage. The default \code{tran.mode=1} corresponds to stochastically increasing shrinkage with uniform prior probability over higher shrinkage states. If \code{tran.mode=2} then shrinakage is stochastically increasing with kernel-based exponential probability over higher shrinkage states. If \code{tran.mode=0} then shrinakage is independent over nodes and there is no stochastically increasing shrinkage.}
+
+  \item{lognu.lb}{The lowerbound of the support for the shrinkage parameter on the log 10 scale.}
+
+  \item{lognu.ub}{The upperbound of the support for the shrinakge parameter on the log 10 scale.}
+
+  \item{n.grid}{The number of grid points used for numerical integration on the shrinkage parameter in computing the marginal likelihood.}
+
+  \item{n.s}{The number of shrinkage states (excluding the complete shrinkage state).}
+
+  \item{n.post.samples}{The number of posterior samples to be drawn.}
 }
-
-\item{max.resol}{The maximum resolution level of the partition tree. The default is \code{10}. The maximum is \code{14}.}
-
-\item{rho0.mode}{The way prior probability for complete shrinkage (i.e., the stopping state) is specified. The default is \code{rho0.mode=0} under which the prior probability for complete shrinkage is the same constant \code{rho0} for all nodes in the partition. If \code{rho0.mode=1} then the probability grows to 1 with the level of the node quadratically: \code{1-(1-rho0)^k}, where k is the level of the node. If \code{rho0.mode=2} then the probability grows to 1 with the level of the node exponentially:
-
-\item{rho0}{Prior probability for complete shrinkage.}
-
-\item{tran.mode}{Type of shrinkage. The default \code{tran.mode=1} corresponds to stochastically increasing shrinkage with uniform prior probability over higher shrinkage states. If \code{tran.mode=2} then shrinakage is stochastically increasing with kernel-based exponential probability over higher shrinkage states. If \code{tran.mode=0} then shrinakage is independent over nodes and there is no stochastically increasing shrinkage.}
-
-\item{lognu.lb}{The lowerbound of the support for the shrinkage parameter on the log 10 scale.}
-
-\item{lognu.ub}{The upperbound of the support for the shrinakge parameter on the log 10 scale.}
-
-\item{n.grid}{The number of grid points used for numerical integration on the shrinkage parameter in computing the marginal likelihood.}
-
-\item{n.s}{The number of shrinkage states (excluding the complete shrinkage state).}
-
-\item{n.post.samples}{The number of posterior samples to be drawn.}
 
 \details{
 %%  ~~ If necessary, more details than the description above ~~
