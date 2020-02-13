@@ -9,12 +9,17 @@ using namespace Rcpp;
 using namespace arma;
 using namespace std;
 
+#ifdef __USE_MISC
+typedef unsigned long int ulong;
+typedef unsigned short int ushort;
+typedef unsigned int uint;
+#endif
+
 union INDEX_TYPE_t {
   unsigned short var[MAXVAR+1]; //var[MAXVAR] gives the bits that represent the left and right children
   unsigned long long index;
 };
 typedef INDEX_TYPE_t INDEX_TYPE;
-
 
 double unifRand();
 
