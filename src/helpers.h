@@ -9,7 +9,8 @@ using namespace Rcpp;
 using namespace arma;
 using namespace std;
 
-#ifdef __USE_MISC
+#ifndef __USE_MISC
+#define __USE_MISC
 typedef unsigned long int ulong;
 typedef unsigned short int ushort;
 typedef unsigned int uint;
