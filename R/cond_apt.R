@@ -10,7 +10,7 @@ cond.apt = function( X, Y, Xpred = NULL, Ypred=NULL, OmegaX.type = "unit", Omega
   p.Y = ncol(Y)
   if (OmegaX.type == "unit") {
 
-    OmegaX = matrix(rep(c(0,1),2*p.X),nrow=p.X,ncol=2,byrow=TRUE)
+    OmegaX = matrix(rep(c(0,1),p.X),nrow=p.X,ncol=2,byrow=TRUE)
 
   } else if(OmegaX.type == "standardized") {
 
@@ -25,7 +25,7 @@ cond.apt = function( X, Y, Xpred = NULL, Ypred=NULL, OmegaX.type = "unit", Omega
 
   if (OmegaY.type == "unit") {
 
-    OmegaY = matrix(rep(c(0,1),2*p.Y),nrow=p.Y,ncol=2,byrow=TRUE)
+    OmegaY = matrix(rep(c(0,1),p.Y),nrow=p.Y,ncol=2,byrow=TRUE)
 
   } else if(OmegaY.type == "standardized") {
 
