@@ -6,7 +6,7 @@ apt = function( X, Xpred = NULL, Omega.type = "unit", max.resol = 10, rho0=0.2, 
 
   if (Omega.type == "unit") {
 
-    Omega = matrix(rep(c(0,1),2*p),nrow=p,ncol=2,byrow=TRUE)
+    Omega = matrix(rep(c(0,1),p),nrow=p,ncol=2,byrow=TRUE)
 
   } else if(Omega.type == "standardized") {
 
