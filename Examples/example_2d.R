@@ -1,3 +1,6 @@
+library(PTT)
+library(mvtnorm)
+
 x.grid = seq(0.0000001,0.9999999,by=0.01)
 y.grid = seq(0.0000001,0.9999999,by=0.01)
 xy.grid = expand.grid(x.grid,y.grid)
@@ -13,8 +16,8 @@ mean=c(0.5,0.5);sigma=diag(c(0.01,0.0064))
 mean.local=c(0.8,0.2); sigma.local = sigma/25
 
 
-norm.obs.mat = mvtnorm::rmvnorm(n=nobs,mean=mean, sigma=sigma)
-norm.obs.mat.local = mvtnorm::rmvnorm(n=nobs, mean=mean.local, sigma=sigma.local)
+norm.obs.mat = rmvnorm(n=nobs,mean=mean, sigma=sigma)
+norm.obs.mat.local = rmvnorm(n=nobs, mean=mean.local, sigma=sigma.local)
 
 p1 = 0.85
 obs.mat = (sample.ind < p1) * norm.obs.mat + (sample.ind >= p1 ) * norm.obs.mat.local
