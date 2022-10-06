@@ -1,6 +1,6 @@
-# Polya tree type models
+# Pólya tree type models
 
-This is an R package that implements a number of Bayesian nonparametric models that extends the Polya tree process, including the adaptive Polya tree (APT), the Markov APT, optional Polya tree (OPT) and conditional APT and OPT, in univariate and multivariate sample spaces.
+This is an R package that implements a number of Bayesian nonparametric models that extends the Pólya tree process, including the adaptive Pólya tree (APT), the Markov APT, optional Pólya tree (OPT) and conditional APT and OPT, in univariate and multivariate sample spaces.
 
 ### Install
 The package can be installed on Linux and Mac using `devtools`:
@@ -19,9 +19,9 @@ For details see examples.
 
 ### Reference
 
-Ma L. (2016) Adaptive shrinkage in Polya tree type models. Bayesian Analysis. doi:10.1214/16-BA1021
+Ma L. (2017) Adaptive shrinkage in Pólya tree type models. Bayesian Analysis. Vol. 12, No. 3, 779-805. DOI:10.1214/16-BA1021
 
-Ma L. (2017) Recursive partitioning and multi-scale modeling on conditional densities. https://arxiv.org/abs/1611.04538
+Ma L. (2017) Recursive partitioning and multi-scale modeling on conditional densities. Electronic Journal of Statistics. Vol. 11, No. 1, 1297-1325. DOI: 10.1214/17-EJS1254 
 
-Wong WH and Ma L. (2010) Optional Polya tree and Bayesian inference. Annals of Statistics. doi:10.1214/09-AOS755
+Wong WH and Ma L. (2010) Optional Polya tree and Bayesian inference. Annals of Statistics. Vol. 38, No. 3, 1433-1459. DOI:10.1214/09-AOS755
 
