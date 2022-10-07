@@ -23,7 +23,7 @@ xpred = c(0.8,0.5)
 x.grid = matrix(rep(xpred,nrow(y.grid)),byrow=TRUE,ncol=2)
 
 ## Fit the cond-OPT
-cond.opt.2D.fit = cond.opt(X=X,Y=Y,Xpred=x.grid,Ypred=y.grid,rho0.X = 0.5,rho0.Y=0.5,max.resX=10,max.resY=10)
+cond.opt.2D.fit = cond.opt(X=X,Y=Y,Xpred=x.grid,Ypred=y.grid,rho0.X = 0.5,rho0.Y=0.5,max.resX=7,max.resY=7)
 ## Plot the predictive density for X=(0.2,0.5)
 image(x=y1.grid,y=y2.grid,z=matrix(cond.opt.2D.fit$predictive_densities,nrow=length(y1.grid)),col=topo.colors(100),
       main=paste("Predictive conditional density at X=(",xpred[1],",",xpred[2],")",sep=""),xlab="Y1",ylab="Y2")

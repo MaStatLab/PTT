@@ -25,7 +25,7 @@ true.den = function(xy.grid) { p1*dmvnorm(xy.grid,mean=mean,sigma=sigma) + (1-p1
 true.den.grid = true.den(xy.grid)
 
 n.post.sample=100
-max.resol = 11
+max.resol = 10
 
 markov.apt.2D.fit = apt(X=obs.mat,Xpred=xy.grid,max.resol=max.resol,rho0=0.2,
                         tran.mode=2,beta=0,n.post.samples = n.post.sample)
